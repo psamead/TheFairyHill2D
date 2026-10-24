@@ -228,7 +228,7 @@ namespace TheFairyHills.Editor
             module.submit = GetActionReference("Submit");
             module.cancel = GetActionReference("Cancel");
             module.point = GetActionReference("Point");
-            module.leftClick = null;
+            module.leftClick = GetActionReference("Click");
             module.rightClick = null;
             module.middleClick = null;
             module.scrollWheel = null;

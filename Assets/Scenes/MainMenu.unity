@@ -1596,7 +1596,7 @@ MonoBehaviour:
   m_MoveAction: {fileID: 0}
   m_SubmitAction: {fileID: 497338721}
   m_CancelAction: {fileID: 613198687}
-  m_LeftClickAction: {fileID: 0}
+  m_LeftClickAction: {fileID: 1749526686}
   m_MiddleClickAction: {fileID: 0}
   m_RightClickAction: {fileID: 0}
   m_ScrollWheelAction: {fileID: 0}
