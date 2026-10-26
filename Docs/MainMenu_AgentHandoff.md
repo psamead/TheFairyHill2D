@@ -9,7 +9,7 @@
 
 The original network source PSD and its network files were left unchanged. The PSD, Fondamento font and selection icon were copied into this project. The `BG_clean_signature`, `left_dark`, and `title_plaque` layers were exported from the PSD for use as editable scene sprites. Button labels remain TextMeshPro objects. Unity generated the needed `.meta` files, TMP font asset and UI input-action reference assets.
 
-The Main Camera has the scene's single enabled AudioListener; the controller creates a 2D AudioSource for UI sounds. The selection icon uses a serialized `(0, -14)` UI-unit offset and snaps directly to the focused option without rotating. Mouse hover selects options through `MainMenuOption.OnPointerEnter`; left-click invokes the hovered button action through the EventSystem Input System UI module. Selection changes play the short synthesized `Menu_HoverChime.wav` UI sound at volume `0.35`; initial focus and repeated hover on the same option are silent. Background music has not been made or connected; see the shared `TechnicalArt/MENU_UNITY_PROGRESS_AND_DESIGN_BACKLOG.md` for ongoing design tasks.
+The Main Camera has the scene's single enabled AudioListener; the controller creates a 2D AudioSource for UI sounds. The selection icon uses a serialized `(0, -14)` UI-unit offset and snaps directly to the focused option without rotating. Mouse hover selects options through `MainMenuOption.OnPointerEnter`; left-click invokes the hovered button action through the EventSystem Input System UI module. Selection changes play the short synthesized `Menu_HoverChime.wav` UI sound at volume `0.35`; initial focus and repeated hover on the same option are silent. MainMenu background music is `Assets/_Project/Audio/Music/MENU_BGM_v1_loop.ogg`, imported as Streaming / Vorbis with preload disabled. A dedicated 2D `MainMenuMusic` source loops on awake at volume `0.6`, separate from the hover chime. The user confirmed in Play Mode that the music works and does not disturb the hover chime.
 
 ## Validation and limits
 
@@ -18,8 +18,8 @@ The Main Camera has the scene's single enabled AudioListener; the controller cre
 - Inspected Canvas scaler (`1920×1080`, match `0.5`), enabled Build Settings order, button interactable flags, and Input System UI references (`Navigate`, `Submit`, `Point`). Continue is disabled as intended.
 - The Build Settings YAML initially contained a zero GUID for the new scene. It has been updated to match `Assets/Scenes/MainMenu.unity.meta`; the builder now includes the same targeted GUID repair. The Editor connection stopped answering later pipeline reads, so this final settings correction and builder adjustment were checked from the saved files but not re-read in Unity.
 - Compared a source-layer reconstruction preview to the provided menu composition. `Unity_Camera_Capture` only returned the Scene View and did not render the Screen Space Overlay UI, so there is no Unity Play Mode visual capture yet.
-- No Play Mode interaction, standalone player build, or test suite was run.
-- The scene file contains exactly one enabled AudioListener, but audio playback has not yet been confirmed in Play Mode.
+- No Play Mode interaction/visual review was completed by the agent, and no standalone player build or test suite was run.
+- The user subsequently confirmed that the MainMenu BGM plays in Play Mode and remains clear alongside the hover chime. The scene file contains exactly one enabled AudioListener.
 - `Scene_Forest_01` does not exist yet. Start checks for that target; until it is added to Build Settings, it displays “The first forest scene is not ready yet.” and logs a warning. It does not load `SampleScene`.
 
 ## Local project baseline and preservation notes

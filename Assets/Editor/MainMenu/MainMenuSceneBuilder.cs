@@ -28,6 +28,7 @@ namespace TheFairyHills.Editor
         private const string InputAssetPath = "Assets/Settings/InputSystem_Actions.inputactions";
         private const string InputReferencesPath = "Assets/_Project/Art/UI/MainMenu/Actions";
         private const string HoverChimePath = "Assets/_Project/Audio/UI/Menu_HoverChime.wav";
+        private const string BackgroundMusicPath = "Assets/_Project/Audio/Music/MENU_BGM_v1_loop.ogg";
 
         [MenuItem("Tools/The Fairy Hills/Build MainMenu Scene")]
         private static void BuildMainMenuScene()
@@ -44,6 +45,9 @@ namespace TheFairyHills.Editor
             AudioClip hoverChime = AssetDatabase.LoadAssetAtPath<AudioClip>(HoverChimePath);
             if (hoverChime == null)
                 throw new InvalidOperationException($"Could not load the menu hover chime at {HoverChimePath}.");
+            AudioClip backgroundMusic = AssetDatabase.LoadAssetAtPath<AudioClip>(BackgroundMusicPath);
+            if (backgroundMusic == null)
+                throw new InvalidOperationException($"Could not load the menu background music at {BackgroundMusicPath}.");
             TMP_FontAsset fontAsset = LoadOrCreateFontAsset();
             InputActionAsset inputActions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputAssetPath);
             if (inputActions == null)
@@ -88,6 +92,14 @@ namespace TheFairyHills.Editor
             GameObject controllerObject = new GameObject("MainMenuController");
             controllerObject.transform.SetParent(canvasObject.transform, false);
             MainMenuController controller = controllerObject.AddComponent<MainMenuController>();
+
+            GameObject musicObject = new GameObject("MainMenuMusic");
+            AudioSource musicSource = musicObject.AddComponent<AudioSource>();
+            musicSource.clip = backgroundMusic;
+            musicSource.loop = true;
+            musicSource.playOnAwake = true;
+            musicSource.volume = 0.6f;
+            musicSource.spatialBlend = 0f;
 
             int[] rowTops = { 517, 591, 671, 751 };
             string[] labels = { "Start", "Continue", "Settings", "Quit" };

@@ -49,13 +49,13 @@ Read `D:\MyObsidian\NoteBookmark\Knowledge Base Home.md`, root `AGENTS.md`, the 
 4. **Input and actions:** added an EventSystem/InputSystemUIInputModule. W/S and Up/Down navigate; mouse hover changes selection and left-click invokes the hovered button. The selection icon snaps to focus at a fixed offset, without easing or rotation.
 5. **Actions:** Start loads `Scene_Forest_01` only if it can be loaded and otherwise displays a status message; Continue is disabled pending a save flow; Settings opens a placeholder panel with Back; Quit calls `Application.Quit()`.
 6. **Build Settings:** placed MainMenu first while retaining the existing enabled `SampleScene` entry. Pre-existing `ProjectSettings` changes were preserved.
-7. **Audio and camera:** added a short synthesized hover/selection chime, played through a runtime 2D AudioSource. The Main Camera has exactly one enabled AudioListener in the saved scene. Background music has not been made or connected; track this in `TechnicalArt/MENU_UNITY_PROGRESS_AND_DESIGN_BACKLOG.md` on the network share.
-8. **Validation so far:** Unity Editor builder compiled and executed for the scene. The saved scene and its controls were inspected, and a source-layer preview was compared against the supplied composition. Later Unity pipeline reads stopped responding, so recent audio/listener changes have only been checked in the saved files; no Play Mode visual/audio check, Player build, or test suite is claimed.
+7. **Audio and camera:** added a short synthesized hover/selection chime at volume `0.35`, played through a runtime 2D AudioSource. Added `MENU_BGM_v1_loop.ogg` as a separate 2D AudioSource set to Streaming / Vorbis / preload off, Loop, Play On Awake, and volume `0.6`. The Main Camera has exactly one enabled AudioListener. The user confirmed in Play Mode that the music works without disturbing the hover chime.
+8. **Validation so far:** Unity Editor builder compiled and executed for the scene. The saved scene and its controls were inspected, and a source-layer preview was compared against the supplied composition. Recent audio/listener setup was checked in the saved files, and the user subsequently confirmed BGM playback and hover-chime balance in Play Mode. A Play Mode visual review, Player build, and test suite are not claimed.
 
 ## Explicitly out of scope for this menu pass
 
 - Three-layer parallax (the source background has not been separated into three scene layers).
-- Doorway effects, Ogham particles, fog, silhouette lighting, background music and gameplay sound effects. A short menu selection chime is included separately.
+- Doorway effects, Ogham particles, fog, silhouette lighting and gameplay sound effects. The MainMenu background music and selection chime are now included.
 - Save-game implementation, gameplay scenes, or broader demo systems.
 
 ## Completion checklist
@@ -66,5 +66,6 @@ Read `D:\MyObsidian\NoteBookmark\Knowledge Base Home.md`, root `AGENTS.md`, the 
 - [x] Implement menu button actions with the missing gameplay destination handled safely.
 - [x] Register the scene in Build Settings without losing existing entries/configuration.
 - [x] Add a selection chime and one enabled AudioListener to the Main Camera.
+- [x] Add MainMenu BGM and confirm in Play Mode that it plays clearly alongside the hover chime (user-confirmed).
 - [ ] Inspect actual Game view layout and interactions in Play Mode at 1920×1080 and 1280×720; no Player build or test suite is claimed.
 - [ ] Update `ART_HANDOFF.md` section 6 and section 9 on the network share only after the menu work is actually complete and the share is writable.
