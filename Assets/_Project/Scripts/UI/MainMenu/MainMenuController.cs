@@ -1,3 +1,4 @@
+using TheFairyHills.Gameplay;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -25,7 +26,7 @@ namespace TheFairyHills.UI
         [SerializeField, Range(0f, 1f)] private float hoverVolume = 0.35f;
         [SerializeField] private GameObject settingsPanel;
         [SerializeField] private TMP_Text statusLabel;
-        [SerializeField] private string firstGameplaySceneName = "Scene_Forest_01";
+        [SerializeField] private string firstGameplaySceneName = "Ch1_S1_Village";
         private MainMenuOption focusedOption;
         private MainMenuOption lastMenuOption;
         private RectTransform selectionRect;
@@ -67,14 +68,6 @@ namespace TheFairyHills.UI
                 settingsPanel.SetActive(false);
         }
 
-        private void OnEnable()
-        {
-            if (startButton != null) startButton.onClick.AddListener(StartGame);
-            if (settingsButton != null) settingsButton.onClick.AddListener(OpenSettings);
-            if (quitButton != null) quitButton.onClick.AddListener(QuitGame);
-            if (settingsBackButton != null) settingsBackButton.onClick.AddListener(CloseSettings);
-        }
-
         private void Start()
         {
             MainMenuOption initialOption = FindOption(startButton);
@@ -94,14 +87,6 @@ namespace TheFairyHills.UI
                 MoveSelection(-1);
             else if (Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame)
                 MoveSelection(1);
-        }
-
-        private void OnDisable()
-        {
-            if (startButton != null) startButton.onClick.RemoveListener(StartGame);
-            if (settingsButton != null) settingsButton.onClick.RemoveListener(OpenSettings);
-            if (quitButton != null) quitButton.onClick.RemoveListener(QuitGame);
-            if (settingsBackButton != null) settingsBackButton.onClick.RemoveListener(CloseSettings);
         }
 
         public void FocusOption(MainMenuOption option)
@@ -174,16 +159,20 @@ namespace TheFairyHills.UI
             }
         }
 
-        private void StartGame()
+        public void StartGame()
         {
-            if (Application.CanStreamedLevelBeLoaded(firstGameplaySceneName))
+            if (!Application.CanStreamedLevelBeLoaded("Core_Persistent") ||
+                !Application.CanStreamedLevelBeLoaded(firstGameplaySceneName))
             {
-                SceneManager.LoadScene(firstGameplaySceneName);
+                SetStatus("The first chapter scene is not available.");
+                Debug.LogWarning($"MainMenu: Core_Persistent or '{firstGameplaySceneName}' is missing from Build Settings.", this);
                 return;
             }
 
-            SetStatus("The first forest scene is not ready yet.");
-            Debug.LogWarning($"MainMenu: scene '{firstGameplaySceneName}' is not in Build Settings yet.", this);
+            // Enter the level first. Its LevelBootstrap adds Core_Persistent and
+            // attaches the already-loaded level, so this route also matches standalone
+            // level testing and cannot lose a menu-owned transition coroutine.
+            SceneManager.LoadScene(firstGameplaySceneName, LoadSceneMode.Single);
         }
 
         private void MoveSelection(int direction)
@@ -210,7 +199,7 @@ namespace TheFairyHills.UI
             }
         }
 
-        private void QuitGame()
+        public void QuitGame()
         {
             Application.Quit();
 #if UNITY_EDITOR

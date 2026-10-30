@@ -1,11 +1,11 @@
 # Agent Handoff — The Fairy Hills Main Menu
 
-**Updated:** 2026-10-24  
+**Updated:** 2026-10-30  
 **Purpose:** Continue MainMenu work from another Claude or Codex computer on the same network.
 
 ## Current result
 
-`Assets/Scenes/MainMenu.unity` is built and registered as the first enabled Build Settings scene; the existing `Assets/Scenes/SampleScene.unity` remains enabled after it. The scene contains the supplied artwork, TMP menu labels, W/S and Up/Down keyboard navigation, mouse-hover selection, placeholder Settings panel, disabled Continue option, and a guarded Start destination.
+`Assets/Scenes/MainMenu.unity` is built and registered first in Build Settings, followed by `Ch1_S1_Village` and `Ch1_S1b_ForestPath`. The user deleted `SampleScene` on 2026-10-30; its stale Build Settings entry was removed. The scene contains the supplied artwork, TMP menu labels, W/S and Up/Down keyboard navigation, mouse-hover selection, placeholder Settings panel, disabled Continue option, and a guarded Start destination.
 
 The original network source PSD and its network files were left unchanged. The PSD, Fondamento font and selection icon were copied into this project. The `BG_clean_signature`, `left_dark`, and `title_plaque` layers were exported from the PSD for use as editable scene sprites. Button labels remain TextMeshPro objects. Unity generated the needed `.meta` files, TMP font asset and UI input-action reference assets.
 
@@ -20,14 +20,14 @@ The Main Camera has the scene's single enabled AudioListener; the controller cre
 - Compared a source-layer reconstruction preview to the provided menu composition. `Unity_Camera_Capture` only returned the Scene View and did not render the Screen Space Overlay UI, so there is no Unity Play Mode visual capture yet.
 - No Play Mode interaction/visual review was completed by the agent, and no standalone player build or test suite was run.
 - The user subsequently confirmed that the MainMenu BGM plays in Play Mode and remains clear alongside the hover chime. The scene file contains exactly one enabled AudioListener.
-- `Scene_Forest_01` does not exist yet. Start checks for that target; until it is added to Build Settings, it displays “The first forest scene is not ready yet.” and logs a warning. It does not load `SampleScene`.
+- Current route: MainMenu Start → `Ch1_S1_Village` → `Ch1_S1b_ForestPath`; the forest endpoint returns to MainMenu as a temporary substitute while S2 is unavailable. These routes were exercised in Play Mode; see `Docs/CH1_UNITY_PROGRESS.md`.
 
 ## Local project baseline and preservation notes
 
 - Project: `C:\Users\Administrator\Documents\UnityProject\TheFairyHill2D`
 - Unity: `6000.3.24f1`, URP 2D, Input System `1.20.0`, uGUI `2.0.0`, PSD Importer `12.0.2`.
-- Existing edits to `ProjectSettings/EditorBuildSettings.asset` and `ProjectSettings/ProjectSettings.asset` predated this task. The editor Build Settings edit now also lists `MainMenu` first. The pre-existing `com.unity.dt.app-ui` entry and `APP_UI_EDITOR_ONLY` define were preserved.
-- `SampleScene.unity` was not modified.
+- Build Settings list `MainMenu`, `Ch1_S1_Village`, and `Ch1_S1b_ForestPath`. The deleted `SampleScene` path is removed, and `ProjectSettings.templateDefaultScene` now points to MainMenu. The `com.unity.dt.app-ui` config object and `APP_UI_EDITOR_ONLY` define remain preserved.
+- No runtime script references `SampleScene`. Both editor scene builders now skip missing scene assets when rebuilding Build Settings.
 
 ## Related Obsidian experience checked
 
@@ -65,5 +65,5 @@ The menu document's heading and blockquote above `## 1` are its top/context sect
 
 1. Open `Assets/Scenes/MainMenu.unity` and visually inspect the Game view in Play Mode at 1920×1080 and 1280×720.
 2. Exercise pointer hover/click, keyboard and gamepad navigation, Settings/Back, disabled Continue, and Quit in the intended target environment.
-3. When `Scene_Forest_01` exists, ensure it is in Build Settings and verify Start loads it.
-4. If changing the builder and rerunning it, check that the `SampleScene` entry and the existing Project Settings edits remain intact.
+3. Confirm the current MainMenu Start destination remains `Ch1_S1_Village`; when the next chapter scene is ready, update the route and verify it in Play Mode.
+4. If changing a scene builder, verify that Build Settings lists only existing scene assets and keeps MainMenu first.

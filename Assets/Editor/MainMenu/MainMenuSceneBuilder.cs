@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using TheFairyHills.UI;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -133,7 +134,11 @@ namespace TheFairyHills.Editor
             backOption.Configure(controller, backButton, backButton.GetComponentInChildren<TMP_Text>(), true);
 
             controller.Configure(menuButtons[0], menuButtons[1], menuButtons[2], menuButtons[3],
-                backButton, menuOptions, selectionIcon, hoverChime, settingsPanel, status, "Scene_Forest_01");
+                backButton, menuOptions, selectionIcon, hoverChime, settingsPanel, status, "Ch1_S1_Village");
+            UnityEventTools.AddPersistentListener(menuButtons[0].onClick, controller.StartGame);
+            UnityEventTools.AddPersistentListener(menuButtons[2].onClick, controller.OpenSettings);
+            UnityEventTools.AddPersistentListener(menuButtons[3].onClick, controller.QuitGame);
+            UnityEventTools.AddPersistentListener(backButton.onClick, controller.CloseSettings);
 
             CreateEventSystem(inputActions);
 
@@ -143,7 +148,7 @@ namespace TheFairyHills.Editor
             AssetDatabase.ImportAsset(ScenePath, ImportAssetOptions.ForceSynchronousImport);
             SetBuildSettings(ScenePath);
             AssetDatabase.SaveAssets();
-            Debug.Log($"Built MainMenu scene at {ScenePath}. Start currently targets 'Scene_Forest_01' and will show a status notice until that scene is registered in Build Settings.");
+            Debug.Log($"Built MainMenu scene at {ScenePath}. Start targets 'Ch1_S1_Village'.");
         }
 
         private static Sprite LoadSprite(string path)
@@ -313,6 +318,22 @@ namespace TheFairyHills.Editor
             SetCenter(cardRect, Vector2.zero, new Vector2(900f, 480f));
             card.GetComponent<Image>().color = new Color(0.055f, 0.105f, 0.15f, 0.98f);
 
+            Sprite frameSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_Project/Art/UI/Frame/UI_frame_celtic.png");
+            GameObject frameObject = new GameObject("Celtic Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            frameObject.transform.SetParent(card.transform, false);
+            RectTransform frameRect = frameObject.GetComponent<RectTransform>();
+            frameRect.anchorMin = Vector2.zero;
+            frameRect.anchorMax = Vector2.one;
+            frameRect.offsetMin = Vector2.zero;
+            frameRect.offsetMax = Vector2.zero;
+            Image frame = frameObject.GetComponent<Image>();
+            frame.sprite = frameSprite;
+            frame.type = Image.Type.Tiled;
+            frame.fillCenter = false;
+            frame.pixelsPerUnitMultiplier = 3.5f;
+            frame.raycastTarget = false;
+            frameObject.transform.SetAsLastSibling();
+
             TMP_Text title = CreateText("Title", card.transform, font, "SETTINGS", 54f, selected,
                 TextAlignmentOptions.Center);
             SetCenter(title.rectTransform, new Vector2(0f, -58f), new Vector2(760f, 90f));
@@ -430,8 +451,9 @@ namespace TheFairyHills.Editor
 
             foreach (EditorBuildSettingsScene existing in EditorBuildSettings.scenes)
             {
-                if (!string.Equals(existing.path, menuScenePath, StringComparison.OrdinalIgnoreCase))
-                    scenes.Add(existing);
+                if (string.Equals(existing.path, menuScenePath, StringComparison.OrdinalIgnoreCase)) continue;
+                if (AssetDatabase.LoadAssetAtPath<SceneAsset>(existing.path) == null) continue;
+                scenes.Add(existing);
             }
 
             EditorBuildSettings.scenes = scenes.ToArray();
