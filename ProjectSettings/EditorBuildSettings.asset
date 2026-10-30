@@ -9,8 +9,14 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: fe2fefb736d104c4db8f2277417f747d
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/Core_Persistent.unity
+    guid: 94330ddf0b21e1b428f2e93f27066404
+  - enabled: 1
+    path: Assets/Scenes/Ch1_S1_Village.unity
+    guid: 2ac7850f417237242bc57ed080f69682
+  - enabled: 1
+    path: Assets/Scenes/Ch1_S1b_ForestPath.unity
+    guid: 79b8a159cbb2415468b3d5c5dba253a5
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

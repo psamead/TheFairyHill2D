@@ -1,0 +1,135 @@
+{
+  "id": "S1_Village",
+  "name": "S1 Dusk Village",
+  "length": 38.4,
+  "palette": "琥珀金 / 草绿",
+  "ceiling": null,
+  "ground": [
+    [
+      [
+        0,
+        0
+      ],
+      [
+        38.4,
+        0
+      ]
+    ]
+  ],
+  "blocks": [
+    {
+      "x": 9.5,
+      "w": 2.79,
+      "h": 1.2,
+      "base": 0,
+      "label": "StoneWall_Low_1.2u",
+      "sprite": "props/S1_prop_wall_low.png"
+    },
+    {
+      "x": 15.0,
+      "w": 1.72,
+      "h": 0.9,
+      "base": 0,
+      "label": "HayBale_0.9u",
+      "sprite": "props/S1_prop_hay.png",
+      "visual_offset_x": -1.0,
+      "visual_offset_y": 0.0,
+      "collider_offset_x": -0.15596342,
+      "collider_offset_y": 0.42,
+      "collider_size_x": 1.3790255,
+      "collider_size_y": 0.84
+    },
+    {
+      "x": 16.8,
+      "w": 4.19,
+      "h": 1.8,
+      "base": 0,
+      "label": "StoneWall_Tall_1.8u",
+      "sprite": "props/S1_prop_wall_tall.png",
+      "collider_offset_x": 2.0378294,
+      "collider_offset_y": 0.9,
+      "collider_size_x": 3.1901226,
+      "collider_size_y": 1.8
+    }
+  ],
+  "pits": [],
+  "platforms": [],
+  "interact": [
+    {
+      "x": 3.5,
+      "y": 0,
+      "type": "start",
+      "label": "StartPoint_NiamhHome"
+    },
+    {
+      "x": 26.41,
+      "y": 0,
+      "type": "reach",
+      "label": "WoodenGate_Pushable_4.8u"
+    },
+    {
+      "x": 37.8,
+      "y": 0,
+      "type": "exit",
+      "label": "Exit_To_ForestPath"
+    }
+  ],
+  "lights": [
+    [
+      6,
+      1.0
+    ],
+    [
+      10.85,
+      1.9
+    ],
+    [
+      12.5,
+      1.2
+    ],
+    [
+      15.8,
+      1.6
+    ],
+    [
+      18.8,
+      2.5
+    ],
+    [
+      21.5,
+      1.3
+    ],
+    [
+      27,
+      1.0
+    ],
+    [
+      29,
+      1.4
+    ],
+    [
+      31,
+      1.0
+    ]
+  ],
+  "mid": [
+    {
+      "x": 0.5,
+      "w": 6,
+      "label": "Cottage_Midground"
+    },
+    {
+      "x": 29,
+      "w": 4,
+      "label": "HawthornTree_Midground"
+    }
+  ],
+  "far": [
+    {
+      "x": 26,
+      "w": 12,
+      "label": "AncientTomb_Silhouette_DistantHill"
+    }
+  ],
+  "_note_v2": "v2 (2026-10-29): Ground leveled; prop widths follow source images; tall stone wall reuses the low-wall sprite at larger scale."
+}

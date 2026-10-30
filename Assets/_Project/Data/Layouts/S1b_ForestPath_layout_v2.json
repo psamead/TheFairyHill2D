@@ -1,0 +1,149 @@
+{
+ "id": "S1b_ForestPath",
+ "name": "Forest Path",
+ "length": 57.6,
+ "palette": "苔绿 / 暮金（过渡到 S2 暮紫）",
+ "ceiling": null,
+ "ground": [
+  [
+   [
+    0,
+    0
+   ],
+   [
+    30,
+    0
+   ]
+  ],
+  [
+   [
+    31.4,
+    0
+   ],
+   [
+    42,
+    0
+   ]
+  ],
+  [
+   [
+    44.6,
+    0
+   ],
+   [
+    57.6,
+    0
+   ]
+  ]
+ ],
+ "pits": [
+  {
+   "x": 30,
+   "w": 1.4,
+   "floor": -1.6,
+   "label": "PitFloor_30.0_SmallGap_1.4u_WalkJump"
+  },
+  {
+   "x": 42,
+   "w": 2.6,
+   "floor": -1.8,
+   "label": "PitFloor_42.0_LargeGap_2.6u_RunJump"
+  }
+ ],
+ "blocks": [
+  {
+   "x": 48.4,
+   "w": 2.24,
+   "h": 1.0,
+   "base": 0,
+   "label": "DecorativeBramble_NonBlocking",
+   "kind": "deco",
+   "sprite": "props/F_prop_bramble.png",
+   "solid": false
+  },
+  {
+   "x": 52.2,
+   "w": 2.2,
+   "h": 3.0,
+   "base": 0,
+   "label": "ThornBarrier_IronPulseTarget",
+   "kind": "thorn",
+   "sprite": "props/F_prop_thornwall.png",
+   "solid": true
+  }
+ ],
+ "platforms": [],
+ "interact": [
+  {
+   "x": 50.54,
+   "y": 0,
+   "type": "pickup_low",
+   "label": "IronCrossPickup_FrayCord",
+   "sprite": "props/F_prop_cross.png"
+  },
+  {
+   "x": 57.0,
+   "y": 0,
+   "type": "exit",
+   "label": "Exit_To_S2"
+  }
+ ],
+ "lights": [
+  [
+   4,
+   1.0
+  ],
+  [
+   8,
+   1.0
+  ],
+  [
+   16,
+   1.8
+  ],
+  [
+   20,
+   1.8
+  ],
+  [
+   24,
+   1.4
+  ],
+  [
+   30.7,
+   1.6
+  ],
+  [
+   36,
+   1.0
+  ],
+  [
+   43.3,
+   2.6
+  ],
+  [
+   47,
+   1.0
+  ]
+ ],
+ "mid": [
+  {
+   "x": 2,
+   "w": 10,
+   "label": "TreeTrunks_LayoutA"
+  },
+  {
+   "x": 28,
+   "w": 18,
+   "label": "GroundRift_FallenTree_LayoutB"
+  }
+ ],
+ "far": [
+  {
+   "x": 0,
+   "w": 57.6,
+   "label": "DistantForest_Silhouette_FadesRight"
+  }
+ ],
+ "_note_v2": "v2 (2026-10-29): Background path and collision ground are level; the ditch is painted on the walkable layer _work/S1b_ForestPath_L3_Walk_ditch_v2.png; prop sizes follow source images."
+}

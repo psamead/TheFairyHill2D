@@ -1,0 +1,154 @@
+{
+ "id": "S1b_ForestPath",
+ "name": "森林小径",
+ "length": 57.6,
+ "palette": "苔绿 / 暮金（过渡到 S2 暮紫）",
+ "ceiling": null,
+ "ground": [
+  [
+   [
+    0,
+    0
+   ],
+   [
+    30,
+    0
+   ]
+  ],
+  [
+   [
+    31.4,
+    0
+   ],
+   [
+    42,
+    0
+   ]
+  ],
+  [
+   [
+    44.6,
+    0
+   ],
+   [
+    57.6,
+    0
+   ]
+  ]
+ ],
+ "pits": [
+  {
+   "x": 30,
+   "w": 1.4,
+   "floor": -1.6,
+   "label": "小沟 1.4u（走跳）"
+  },
+  {
+   "x": 42,
+   "w": 2.6,
+   "floor": -1.8,
+   "label": "大沟 2.6u（跑跳；助跑 10u）"
+  }
+ ],
+ "blocks": [
+  {
+   "x": 47.0,
+   "w": 4.48,
+   "h": 2.0,
+   "base": 0,
+   "label": "荆棘丛（装饰，不挡路，夸张放大）",
+   "kind": "deco",
+   "sprite": "props/F_prop_bramble_v2.png",
+   "solid": false
+  },
+  {
+   "x": 50.8,
+   "w": 7.19,
+   "h": 6.0,
+   "base": 0,
+   "label": "受控荆棘墙（图 7.19u 宽，两侧是散开的枝条；碰撞只取中间实心 4.4u：x 52.2–56.6；IronPulse 驱散）",
+   "kind": "thorn",
+   "sprite": "props/F_prop_thornwall_v2.png",
+   "solid": true,
+   "collider_x": 52.2,
+   "collider_w": 4.4
+  }
+ ],
+ "platforms": [],
+ "interact": [
+  {
+   "x": 50.58,
+   "y": 0,
+   "type": "pickup_low",
+   "label": "家传铁十字（夸张放大约 1.2u；远处只显示闪光星星，走近 2.5u 内才显现）",
+   "sprite": "props/F_prop_cross_v2.png",
+   "reveal_radius": 2.5,
+   "hint_fx": "FX/FX_sparkle_star.png"
+  },
+  {
+   "x": 57.2,
+   "y": 0,
+   "type": "exit",
+   "label": "出口 → S2"
+  }
+ ],
+ "lights": [
+  [
+   4,
+   1.0
+  ],
+  [
+   8,
+   1.0
+  ],
+  [
+   16,
+   1.8
+  ],
+  [
+   20,
+   1.8
+  ],
+  [
+   24,
+   1.4
+  ],
+  [
+   30.7,
+   1.6
+  ],
+  [
+   36,
+   1.0
+  ],
+  [
+   43.3,
+   2.6
+  ],
+  [
+   47,
+   1.0
+  ]
+ ],
+ "mid": [
+  {
+   "x": 2,
+   "w": 10,
+   "label": "树干列（FOREST_A 构图）"
+  },
+  {
+   "x": 28,
+   "w": 18,
+   "label": "地面裂口 + 倒树（FOREST_B 构图）"
+  }
+ ],
+ "far": [
+  {
+   "x": 0,
+   "w": 57.6,
+   "label": "远林剪影，向右渐暗"
+  }
+ ],
+ "_note_v2": "v2（2026-10-29）：背景路面是平的，地面拉平；地沟画在可行走层 _work/S1b_ForestPath_L3_Walk_ditch_v2.png 上；物件尺寸按实际图片。",
+ "_note_v3": "v3（2026-10-30）：物件夸张放大；路面上沿加同速草土边 _work/S1b_ForestPath_L3b_GrassEdge.png；前景 L4 透明度 0.55、视差 1.15。 荆棘墙换成 Nano Banana 修过边缘的版本（719×600），碰撞用 collider_x / collider_w 单独指定。"
+}
