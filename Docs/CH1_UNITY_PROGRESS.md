@@ -112,3 +112,26 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 - Updated the builder to read `S1_Village_layout_v3.json`, create one closed/open gate sprite with JSON-driven blocker/range, and create fitted dark-backed thin-frame HUD panels. The controls hint and interaction/message panels use 12 px padding; Core has no Celtic HUD frame. The MainMenu Settings frame remains unchanged.
 - Rebuilt and saved only `Core_Persistent` and `Ch1_S1_Village`. Preserved Niamh's capsule (Size `(0.23, 2.08)`, Offset `(0.08, 1.04)`). Build Settings stayed at four scenes; the exit at x=37.8 still targets `Ch1_S1b_ForestPath`. Forest and MainMenu scene files were not changed.
 - Missing-script scan found 0 components in Core, Village, Forest, and MainMenu. Unity Editor compilation and scene generation succeeded. The first build attempt exposed a duplicated `props/` path; it was corrected and the rebuild succeeded. No automated tests were run per the Batch A rule. Manual Play Mode checks remain pending for HUD appearance, gate open/close, and the Village-to-Forest transition.
+
+## Revision v3 — Batch B: Forest visuals (2026-11-01)
+
+- Imported Forest v4 layers and v3 props as single sprites at 100 PPU with uncompressed textures. The 1335 px layers use pivot `(0, 270/1335)`. Copied `F_prop_thornwall_v3.png` from the shared folder; earlier art files remain intact.
+- Updated `Chapter1SceneBuilder` to read `S1b_ForestPath_layout_v4.json`. Forest layers now use L2 undergrowth at 0.65 / order -20, continuous L3b v3 at 1.0 / order -9, and L4 Fore v2 at alpha 1.0 / parallax 1.15. Bramble is decorative at order 12; the cross is order 11.
+- Added post-gap cross stars (activated after x=44.6; scattered stars reduce on reveal while the main star remains until pickup). Added the additive B0202A thorn glow and radius-6 Point Light. IronPulse turns the light off over 0.3 s, emits the configured 80 + 40/s smoke with red ember sub-emitter, fades the wall over 0.6 s, then disables its blocker.
+- Rebuilt and saved only `Ch1_S1b_ForestPath`. The exit remains at x=59.5 in a 60-unit level and returns to MainMenu. No automated tests were run per the Batch B rule. Unity compilation, builder execution, sprite import settings, and scene structure were inspected; Play Mode visual/gameplay checks remain for the user.
+
+## Black Forest Game View — 2026-11-01
+
+- The user's Play Mode screenshot showed `Core_Persistent` and `Ch1_S1b_ForestPath` loaded, while the Game view was black. Build Settings included Forest and Unity Console had no errors, so this was a rendering issue rather than a failed scene transition.
+- Forest and Core sprites use URP `Sprite-Lit-Default`; neither Core nor the chapter scenes had a Global Light 2D. Forest's only light was the red point light near x=55.5, radius 6, far from the x=3.5 entry spawn.
+- Added a neutral white Global Light 2D at intensity 1 to `Core_Persistent`, and updated `Chapter1SceneBuilder.BuildCoreScene` to create it on future Core rebuilds. It targets the Default sorting layer.
+- Unity saved and reloaded the Core scene with no Console errors. Play Mode was stopped to save the persistent scene change; the user should start from MainMenu and verify the visuals in Play Mode.
+
+## Village Gate Foreground Order — 2026-11-01
+
+- Raised the WoodenGate visual sorting order from -5 to 11 so it renders in front of Niamh's sprite (order 10), while remaining behind the foreground grass layer (order 20). Updated both the saved Village scene and its layout JSON so rebuilds retain the change.
+- Gate collider, interaction range, open/close behavior, and position were left unchanged.
+
+## Village Gate Layer Reverted — 2026-11-01
+
+- Reverted the gate visual to sorting order -5 after the foreground placement caused a visual/design issue. Scene and layout JSON now agree; collider and interaction settings remain unchanged.
