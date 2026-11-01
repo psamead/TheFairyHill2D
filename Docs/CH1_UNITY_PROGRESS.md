@@ -100,3 +100,8 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 - Preserved the user-adjusted capsule in `Assets/Scenes/Core_Persistent.unity`: vertical `CapsuleCollider2D`, Offset `(0.08, 1.04)`, Size `(0.23, 2.08)`, not a trigger. Niamh remains at `(3.5, 0, 0)` with a Dynamic Rigidbody2D and Gravity Scale 0. The capsule's lower edge is at y=0.
 - Updated `Chapter1SceneBuilder.CreatePlayer` to use the same size and offset, so rebuilding `Core_Persistent` keeps this adjustment. No movement or collision-query code needed changes.
 - The saved Core scene asset on disk contains the collider values shown in the user's screenshot. No scene rebuild or Play Mode test was run.
+
+## Revision v3 rollback — 2026-11-01
+
+- After the Revision v3 implementation attempt, the user reported a problem and requested a return to the pre-task project state. The v3-only scene, asset, script, test, and project-setting changes were rolled back; the earlier Niamh collider update and other pre-existing project changes were preserved.
+- The problem's specific symptom and reproduction steps were not provided, so its cause was not diagnosed. Revision v3 implementation changes were not published to GitHub; the published update is the Niamh collision progress note only.
