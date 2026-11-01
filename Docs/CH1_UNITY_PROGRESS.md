@@ -94,3 +94,9 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 ## GitHub publication scope — 2026-10-30
 
 - The Chapter 1 publication includes the chapter scenes, gameplay/editor code, layouts, art, font glyph updates, and progress note. Pending MainMenu scene/controller/builder edits are intentionally excluded from this push, so the GitHub MainMenu-to-Chapter-1 route remains a separate pending integration.
+
+## Niamh collision update — 2026-11-01
+
+- Preserved the user-adjusted capsule in `Assets/Scenes/Core_Persistent.unity`: vertical `CapsuleCollider2D`, Offset `(0.08, 1.04)`, Size `(0.23, 2.08)`, not a trigger. Niamh remains at `(3.5, 0, 0)` with a Dynamic Rigidbody2D and Gravity Scale 0. The capsule's lower edge is at y=0.
+- Updated `Chapter1SceneBuilder.CreatePlayer` to use the same size and offset, so rebuilding `Core_Persistent` keeps this adjustment. No movement or collision-query code needed changes.
+- The saved Core scene asset on disk contains the collider values shown in the user's screenshot. No scene rebuild or Play Mode test was run.
