@@ -13,6 +13,7 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.Rendering.Universal;
 
 namespace TheFairyHills.Editor
 {
@@ -26,6 +27,7 @@ namespace TheFairyHills.Editor
         public Chapter1PitData[] pits;
         public Chapter1BlockData[] blocks;
         public Chapter1InteractData[] interact;
+        public Chapter1ForestLayers layers;
     }
 
     [Serializable]
@@ -47,6 +49,8 @@ namespace TheFairyHills.Editor
         public string label;
         public string kind;
         public string sprite;
+        public string glow;
+        public float sorting_order;
         public float visual_offset_x;
         public float visual_offset_y;
         public bool solid;
@@ -76,13 +80,31 @@ namespace TheFairyHills.Editor
         public float blocker_h;
         public float range_x0;
         public float range_x1;
+        public float hint_trigger_x;
+    }
+
+    [Serializable]
+    internal sealed class Chapter1ForestLayers
+    {
+        public Chapter1ForestLayerData L2_undergrowth;
+        public Chapter1ForestLayerData L3b_grass_edge;
+        public Chapter1ForestLayerData L4_fore;
+    }
+
+    [Serializable]
+    internal sealed class Chapter1ForestLayerData
+    {
+        public string sprite;
+        public float parallax;
+        public int sorting_order;
+        public float alpha = 1f;
     }
 
     /// <summary>Builds the first two playable Chapter 1 graybox scenes from their approved JSON layouts.</summary>
     internal static class Chapter1SceneBuilder
     {
         private const string VillageLayoutPath = "Assets/_Project/Data/Layouts/S1_Village_layout_v3.json";
-        private const string ForestLayoutPath = "Assets/_Project/Data/Layouts/S1b_ForestPath_layout_v3.json";
+        private const string ForestLayoutPath = "Assets/_Project/Data/Layouts/S1b_ForestPath_layout_v4.json";
         private const string NiamhSpritePath = "Assets/_Project/Art/Characters/Niamh/Niamh_side_static_v3.png";
         private const string MenuScenePath = "Assets/Scenes/MainMenu.unity";
         private const string VillageScenePath = "Assets/Scenes/Ch1_S1_Village.unity";
@@ -92,6 +114,7 @@ namespace TheFairyHills.Editor
         private const string SoftParticleMaterialPath = "Assets/_Project/Art/FX/M_FX_SoftParticle.mat";
         private const string HudFramePath = "Assets/_Project/Art/UI/HUD/UI_frame_thin.png";
         private const string HudPanelPath = "Assets/_Project/Art/UI/HUD/UI_panel_dark.png";
+        private const string EmberMaterialPath = "Assets/_Project/Art/FX/M_FX_EmberAdditive.mat";
 
         [MenuItem("Tools/The Fairy Hills/Build Chapter 1 Scenes")]
         private static void BuildFromMenu() => BuildBothScenes();
@@ -138,6 +161,85 @@ namespace TheFairyHills.Editor
             AssetDatabase.SaveAssets();
             EditorSceneManager.OpenScene(MenuScenePath, OpenSceneMode.Single);
             Debug.Log("Built Revision v3 Batch A: Core_Persistent HUD and S1 Village gate. Forest, MainMenu, and Build Settings were left unchanged.");
+        }
+
+        [MenuItem("Tools/The Fairy Hills/Build Revision v3 Batch B - Forest Visuals")]
+        private static void BuildRevisionV3BatchBForest()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode before building Revision v3 Batch B.");
+
+            Scene activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.IsValid() && activeScene.isDirty)
+                throw new InvalidOperationException($"Save the dirty scene '{activeScene.path}' before building Revision v3 Batch B.");
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ConfigureBatchBForestAssets();
+            Chapter1LayoutData forest = LoadLayout(ForestLayoutPath);
+            BuildScene(forest, ForestScenePath, true);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Built Revision v3 Batch B: Forest visuals only. Core, Village, MainMenu, and Build Settings were left unchanged.");
+        }
+
+        private static void ConfigureBatchBForestAssets()
+        {
+            const string forestFolder = "Assets/_Project/Art/Backgrounds/S1b_ForestPath/";
+            string[] layerPaths =
+            {
+                forestFolder + "S1b_ForestPath_L2_Undergrowth.png",
+                forestFolder + "S1b_ForestPath_L3b_GrassEdge_v3.png",
+                forestFolder + "S1b_ForestPath_L4_Fore_v2.png"
+            };
+            foreach (string path in layerPaths) ConfigureSpriteImport(path, true, false);
+
+            string[] propPaths =
+            {
+                forestFolder + "props/F_prop_bramble_v3.png",
+                forestFolder + "props/F_prop_thornwall_v3.png",
+                forestFolder + "props/F_prop_thornwall_v3_glow.png",
+                forestFolder + "props/F_prop_cross_v2.png",
+                "Assets/_Project/Art/FX/FX_sparkle_star.png",
+                "Assets/_Project/Art/FX/FX_soft_dot.png"
+            };
+            foreach (string path in propPaths) ConfigureSpriteImport(path, false, false);
+            ConfigureForestParticleMaterial();
+            ConfigureEmberMaterial();
+        }
+
+        private static void ConfigureForestParticleMaterial()
+        {
+            Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (shader == null) throw new InvalidOperationException("URP Particles/Unlit shader is unavailable.");
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(SoftParticleMaterialPath);
+            if (material == null)
+            {
+                material = new Material(shader) { name = "M_FX_SoftParticle" };
+                AssetDatabase.CreateAsset(material, SoftParticleMaterialPath);
+            }
+            else material.shader = shader;
+            material.SetTexture("_BaseMap", LoadSprite("Assets/_Project/Art/FX/FX_soft_dot.png").texture);
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_Blend", 0f);
+            material.SetColor("_BaseColor", Color.white);
+            EditorUtility.SetDirty(material);
+        }
+
+        private static void ConfigureEmberMaterial()
+        {
+            Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (shader == null) throw new InvalidOperationException("URP Particles/Unlit shader is unavailable.");
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(EmberMaterialPath);
+            if (material == null)
+            {
+                material = new Material(shader) { name = "M_FX_EmberAdditive" };
+                AssetDatabase.CreateAsset(material, EmberMaterialPath);
+            }
+            else material.shader = shader;
+            material.SetTexture("_BaseMap", LoadSprite("Assets/_Project/Art/FX/FX_soft_dot.png").texture);
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_Blend", 2f);
+            material.SetColor("_BaseColor", Color.white);
+            EditorUtility.SetDirty(material);
         }
 
         private static void ConfigureRevisionAssets()
@@ -206,6 +308,7 @@ namespace TheFairyHills.Editor
         {
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             Camera camera = CreateCamera(initialLength);
+            CreateGlobalLight2D();
             ChapterHUD hud = CreateHud();
             GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
             InputSystemUIInputModule uiModule = eventSystem.GetComponent<InputSystemUIInputModule>();
@@ -226,6 +329,15 @@ namespace TheFairyHills.Editor
             if (!EditorSceneManager.SaveScene(scene, "Assets/Scenes/Core_Persistent.unity"))
                 throw new InvalidOperationException("Could not save Core_Persistent scene.");
             AssetDatabase.ImportAsset("Assets/Scenes/Core_Persistent.unity", ImportAssetOptions.ForceSynchronousImport);
+        }
+
+        private static void CreateGlobalLight2D()
+        {
+            GameObject lightObject = new GameObject("Global Light 2D");
+            Light2D light = lightObject.AddComponent<Light2D>();
+            light.lightType = Light2D.LightType.Global;
+            light.color = Color.white;
+            light.intensity = 1f;
         }
 
         private static InputActionReference LoadInputReference(string name) =>
@@ -379,9 +491,17 @@ namespace TheFairyHills.Editor
             {
                 CreateLayer("L0_Sky", "Assets/_Project/Art/Backgrounds/S1b_ForestPath/S1b_ForestPath_L0_Sky_wip.png", -50, 0.05f, camera);
                 CreateLayer("L1_Far", "Assets/_Project/Art/Backgrounds/S1b_ForestPath/S1b_ForestPath_L1_Far_wip.png", -40, 0.4f, camera);
+                Chapter1ForestLayers layers = layout.layers;
+                if (layers == null || layers.L2_undergrowth == null || layers.L3b_grass_edge == null || layers.L4_fore == null)
+                    throw new InvalidDataException("Forest v4 layout is missing its layer definitions.");
+                string folder = "Assets/_Project/Art/Backgrounds/S1b_ForestPath/";
+                CreateLayer("L2_Undergrowth", folder + layers.L2_undergrowth.sprite,
+                    LayerOrder(layers.L2_undergrowth.sorting_order, -20), layers.L2_undergrowth.parallax, camera, layers.L2_undergrowth.alpha);
                 CreateLayer("L3_Walk", "Assets/_Project/Art/Backgrounds/S1b_ForestPath/S1b_ForestPath_L3_Walk_ditch_v2.png", -10, 1f, camera);
-                CreateLayer("L3b_GrassEdge", "Assets/_Project/Art/Backgrounds/S1b_ForestPath/S1b_ForestPath_L3b_GrassEdge.png", -9, 1f, camera);
-                CreateLayer("L4_Fore", "Assets/_Project/Art/Backgrounds/S1b_ForestPath/S1b_ForestPath_L4_Fore_wip.png", 20, 1.15f, camera, 0.55f);
+                CreateLayer("L3b_GrassEdge", folder + layers.L3b_grass_edge.sprite,
+                    LayerOrder(layers.L3b_grass_edge.sorting_order, -9), layers.L3b_grass_edge.parallax, camera, layers.L3b_grass_edge.alpha);
+                CreateLayer("L4_Fore", folder + layers.L4_fore.sprite,
+                    LayerOrder(layers.L4_fore.sorting_order, 20), layers.L4_fore.parallax, camera, layers.L4_fore.alpha);
             }
             else
             {
@@ -406,6 +526,8 @@ namespace TheFairyHills.Editor
             renderer.color = layerColor;
             layer.AddComponent<ParallaxLayer>().Configure(camera, factor);
         }
+
+        private static int LayerOrder(int requestedOrder, int fallback) => requestedOrder == 0 ? fallback : requestedOrder;
 
         private static void CreateGroundAndPits(Chapter1LayoutData layout)
         {
@@ -573,10 +695,11 @@ namespace TheFairyHills.Editor
             Sprite sprite = LoadSprite(folder + block.sprite);
             GameObject root = new GameObject(block.label);
             root.transform.position = new Vector3(block.x, block.@base, 0f);
-            SpriteRenderer renderer = CreateScaledSprite(root.transform, sprite, block.w, block.h, 0);
+            bool isThorn = block.kind == "thorn";
+            int order = Mathf.RoundToInt(block.sorting_order != 0f ? block.sorting_order : isThorn ? 10f : 0f);
+            SpriteRenderer renderer = CreateScaledSprite(root.transform, sprite, block.w, block.h, order);
             renderer.transform.localPosition = new Vector3(block.visual_offset_x, block.visual_offset_y, 0f);
 
-            bool isThorn = block.kind == "thorn";
             bool solid = string.IsNullOrEmpty(block.kind) || block.solid;
             root.name = EnglishSceneName(block.label);
             BoxCollider2D collider = null;
@@ -602,8 +725,28 @@ namespace TheFairyHills.Editor
                 float barrierLocalX = block.collider_w > 0f ? block.collider_x - block.x : 0.04f;
                 barrier.size = new Vector2(barrierWidth, block.h);
                 barrier.offset = new Vector2(barrierLocalX + barrierWidth * 0.5f, block.h * 0.5f);
-                ParticleSystem smoke = CreateSmoke(root.transform, new Vector3(block.w * 0.5f, block.h * 0.7f, -0.1f));
-                root.AddComponent<ThornWall>().Configure(renderer, barrier, smoke);
+                Vector3 effectCenter = new Vector3(barrierLocalX + barrierWidth * 0.5f, block.h * 0.5f, -0.1f);
+                ParticleSystem smoke = CreateSmoke(root.transform, effectCenter, new Vector2(barrierWidth, block.h));
+                SpriteRenderer glow = null;
+                Light2D redLight = null;
+                if (!string.IsNullOrEmpty(block.glow))
+                {
+                    Sprite glowSprite = LoadSprite(folder + block.glow);
+                    glow = CreateScaledSprite(root.transform, glowSprite, block.w, block.h, order + 1);
+                    glow.gameObject.name = "Red Glow Overlay";
+                    glow.sharedMaterial = GetThornGlowMaterial(glowSprite.texture);
+                    glow.color = new Color32(176, 32, 42, 128);
+                    GameObject lightObject = new GameObject("Thorn Wall Red Point Light");
+                    lightObject.transform.SetParent(root.transform, false);
+                    lightObject.transform.localPosition = effectCenter;
+                    redLight = lightObject.AddComponent<Light2D>();
+                    redLight.lightType = Light2D.LightType.Point;
+                    redLight.color = new Color32(176, 32, 42, 255);
+                    redLight.pointLightOuterRadius = 6f;
+                    redLight.intensity = 0.45f;
+                    redLight.shadowsEnabled = false;
+                }
+                root.AddComponent<ThornWall>().Configure(renderer, barrier, smoke, glow, redLight);
             }
         }
 
@@ -650,14 +793,17 @@ namespace TheFairyHills.Editor
             string path = "Assets/_Project/Art/Backgrounds/S1b_ForestPath/props/F_prop_cross_v2.png";
             GameObject pickup = new GameObject("IronCrossPickup_FamilyHeirloom");
             pickup.transform.position = new Vector3(interaction.x, interaction.y + 0.03f, -0.1f);
-            SpriteRenderer cross = CreateScaledSprite(pickup.transform, LoadSprite(path), 1.2f, 1f, 2);
+            SpriteRenderer cross = CreateScaledSprite(pickup.transform, LoadSprite(path), 1.2f, 1f,
+                interaction.sorting_order == 0f ? 11 : Mathf.RoundToInt(interaction.sorting_order));
             cross.transform.localPosition = new Vector3(-0.6f, 0f, 0f);
             BoxCollider2D trigger = pickup.AddComponent<BoxCollider2D>();
             trigger.isTrigger = true;
             trigger.size = new Vector2(1.3f, 1.2f);
             trigger.offset = new Vector2(0f, 0.6f);
             ParticleSystem stars = CreateSparkleHint(pickup.transform);
-            pickup.AddComponent<IronCrossPickup>().Configure(cross, stars, 2.5f);
+            SpriteRenderer mainStar = CreateMainStar(pickup.transform, interaction.sorting_order == 0f ? 11 :
+                Mathf.RoundToInt(interaction.sorting_order));
+            pickup.AddComponent<IronCrossPickup>().Configure(cross, stars, mainStar, 2.5f, interaction.hint_trigger_x);
         }
 
         private static ParticleSystem CreateSparkleHint(Transform parent)
@@ -669,22 +815,45 @@ namespace TheFairyHills.Editor
             ParticleSystem.MainModule main = stars.main;
             main.loop = true;
             main.playOnAwake = false;
-            main.startLifetime = 0.6f;
-            main.startSpeed = 0.05f;
-            main.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.16f);
+            main.startLifetime = 0.5f;
+            main.startSpeed = new ParticleSystem.MinMaxCurve(0.02f, 0.12f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.4f, 0.7f);
             main.startColor = new Color(1f, 0.86f, 0.52f, 0.95f);
-            main.maxParticles = 10;
+            main.maxParticles = 36;
             ParticleSystem.EmissionModule emission = stars.emission;
-            emission.rateOverTime = 0f;
-            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 2, 3, 1, 0.45f) });
+            emission.rateOverTime = new ParticleSystem.MinMaxCurve(4f, 6f);
             ParticleSystem.ShapeModule shape = stars.shape;
             shape.shapeType = ParticleSystemShapeType.Circle;
-            shape.radius = 0.6f;
+            shape.radius = 1.2f;
             shape.radiusThickness = 0f;
+            ParticleSystem.ColorOverLifetimeModule color = stars.colorOverLifetime;
+            color.enabled = true;
+            color.color = new ParticleSystem.MinMaxGradient(CreateAlphaFadeGradient(new Color32(255, 220, 150, 255)));
+            ParticleSystem.SizeOverLifetimeModule size = stars.sizeOverLifetime;
+            size.enabled = true;
+            size.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(
+                new Keyframe(0f, 0.65f), new Keyframe(1f, 1.5f)));
             ParticleSystemRenderer renderer = stars.GetComponent<ParticleSystemRenderer>();
             renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            renderer.sortingOrder = 13;
             renderer.sharedMaterial = GetSparkleMaterial();
             return stars;
+        }
+
+        private static SpriteRenderer CreateMainStar(Transform parent, int crossOrder)
+        {
+            GameObject starObject = new GameObject("Iron Cross Main Star");
+            starObject.transform.SetParent(parent, false);
+            starObject.transform.localPosition = new Vector3(0f, 0.55f, -0.15f);
+            SpriteRenderer renderer = starObject.AddComponent<SpriteRenderer>();
+            renderer.sprite = LoadSprite("Assets/_Project/Art/FX/FX_sparkle_star.png");
+            renderer.sortingOrder = crossOrder + 2;
+            renderer.sharedMaterial = GetSparkleMaterial();
+            renderer.color = new Color32(255, 224, 157, 255);
+            Vector2 size = renderer.sprite.bounds.size;
+            starObject.transform.localScale = new Vector3(0.8f / size.x, 0.8f / size.y, 1f);
+            starObject.SetActive(false);
+            return renderer;
         }
 
         private static Material GetSparkleMaterial()
@@ -714,34 +883,98 @@ namespace TheFairyHills.Editor
             sceneExit.Configure(forest ? string.Empty : "Ch1_S1b_ForestPath", forest, forest, "Spawn_FromVillage");
         }
 
-        private static ParticleSystem CreateSmoke(Transform parent, Vector3 localPosition)
+        private static ParticleSystem CreateSmoke(Transform parent, Vector3 localPosition, Vector2 area)
         {
-            GameObject smokeObject = new GameObject("Black Smoke Placeholder");
+            GameObject smokeObject = new GameObject("Thorn Wall Purple Smoke");
             smokeObject.transform.SetParent(parent, false);
             smokeObject.transform.localPosition = localPosition;
             ParticleSystem particles = smokeObject.AddComponent<ParticleSystem>();
             ParticleSystem.MainModule main = particles.main;
             main.loop = false;
             main.playOnAwake = false;
-            main.duration = 0.8f;
-            main.startLifetime = 0.7f;
-            main.startSpeed = 0.7f;
-            main.startSize = 0.26f;
-            main.startColor = new Color(0.055f, 0.025f, 0.07f, 0.86f);
-            main.maxParticles = 32;
+            main.duration = 1.2f;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(1.5f, 2.5f);
+            main.startSpeed = 0f;
+            main.startSize = new ParticleSystem.MinMaxCurve(1f, 2.5f);
+            main.startColor = new ParticleSystem.MinMaxGradient(new Color32(26, 14, 34, 220));
+            main.maxParticles = 180;
             ParticleSystem.EmissionModule emission = particles.emission;
-            emission.rateOverTime = 0f;
-            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 14) });
+            emission.rateOverTime = 40f;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 80) });
             ParticleSystem.ShapeModule shape = particles.shape;
-            shape.shapeType = ParticleSystemShapeType.Cone;
-            shape.angle = 22f;
-            shape.radius = 0.18f;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = new Vector3(area.x, area.y, 0.1f);
             ParticleSystem.VelocityOverLifetimeModule velocity = particles.velocityOverLifetime;
             velocity.enabled = true;
-            velocity.y = new ParticleSystem.MinMaxCurve(0.9f);
-            particles.GetComponent<ParticleSystemRenderer>().sharedMaterial =
-                AssetDatabase.LoadAssetAtPath<Material>(SoftParticleMaterialPath);
+            velocity.y = new ParticleSystem.MinMaxCurve(1.5f, 3f);
+            ParticleSystem.NoiseModule noise = particles.noise;
+            noise.enabled = true;
+            noise.strength = new ParticleSystem.MinMaxCurve(0.5f, 1f);
+            noise.frequency = 0.5f;
+            ParticleSystem.ColorOverLifetimeModule color = particles.colorOverLifetime;
+            color.enabled = true;
+            color.color = new ParticleSystem.MinMaxGradient(CreateAlphaFadeGradient(new Color32(26, 14, 34, 230)));
+            ParticleSystem.SizeOverLifetimeModule size = particles.sizeOverLifetime;
+            size.enabled = true;
+            size.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(1f, 1.5f)));
+            ParticleSystemRenderer smokeRenderer = particles.GetComponent<ParticleSystemRenderer>();
+            smokeRenderer.renderMode = ParticleSystemRenderMode.Billboard;
+            smokeRenderer.sortingOrder = 14;
+            smokeRenderer.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(SoftParticleMaterialPath);
+
+            GameObject emberObject = new GameObject("Dark Red Embers");
+            emberObject.transform.SetParent(smokeObject.transform, false);
+            ParticleSystem embers = emberObject.AddComponent<ParticleSystem>();
+            ParticleSystem.MainModule emberMain = embers.main;
+            emberMain.loop = false;
+            emberMain.playOnAwake = false;
+            emberMain.startLifetime = new ParticleSystem.MinMaxCurve(0.35f, 0.8f);
+            emberMain.startSpeed = new ParticleSystem.MinMaxCurve(0.4f, 1.1f);
+            emberMain.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.2f);
+            emberMain.startColor = new ParticleSystem.MinMaxGradient(new Color32(150, 24, 34, 240));
+            emberMain.maxParticles = 40;
+            ParticleSystem.EmissionModule emberEmission = embers.emission;
+            emberEmission.enabled = false;
+            ParticleSystem.VelocityOverLifetimeModule emberVelocity = embers.velocityOverLifetime;
+            emberVelocity.enabled = true;
+            emberVelocity.y = new ParticleSystem.MinMaxCurve(0.5f, 1.5f);
+            ParticleSystemRenderer emberRenderer = embers.GetComponent<ParticleSystemRenderer>();
+            emberRenderer.renderMode = ParticleSystemRenderMode.Billboard;
+            emberRenderer.sortingOrder = 15;
+            emberRenderer.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(EmberMaterialPath);
+            ParticleSystem.SubEmittersModule subEmitters = particles.subEmitters;
+            subEmitters.AddSubEmitter(embers, ParticleSystemSubEmitterType.Birth,
+                ParticleSystemSubEmitterProperties.InheritNothing, 0.12f);
             return particles;
+        }
+
+        private static Gradient CreateAlphaFadeGradient(Color color)
+        {
+            Gradient gradient = new Gradient();
+            gradient.SetKeys(
+                new[] { new GradientColorKey(color, 0f), new GradientColorKey(color, 1f) },
+                new[] { new GradientAlphaKey(color.a / 255f, 0f), new GradientAlphaKey(0f, 1f) });
+            return gradient;
+        }
+
+        private static Material GetThornGlowMaterial(Texture texture)
+        {
+            const string path = "Assets/_Project/Art/FX/M_FX_ThornGlowAdditive.mat";
+            Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (shader == null) throw new InvalidOperationException("URP Particles/Unlit shader is unavailable.");
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material == null)
+            {
+                material = new Material(shader) { name = "M_FX_ThornGlowAdditive" };
+                AssetDatabase.CreateAsset(material, path);
+            }
+            else material.shader = shader;
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_Blend", 2f);
+            material.SetColor("_BaseColor", Color.white);
+            EditorUtility.SetDirty(material);
+            return material;
         }
 
         private static SpriteRenderer CreateScaledSprite(Transform parent, Sprite sprite, float width, float height, int order)

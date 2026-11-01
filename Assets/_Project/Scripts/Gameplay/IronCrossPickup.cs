@@ -8,16 +8,27 @@ namespace TheFairyHills.Gameplay
     {
         [SerializeField] private SpriteRenderer crossRenderer;
         [SerializeField] private ParticleSystem hintStars;
+        [SerializeField] private SpriteRenderer mainStar;
         [SerializeField] private float revealRadius = 2.5f;
+        [SerializeField] private float hintTriggerX = float.NegativeInfinity;
         private PlayerController2D player;
         private bool revealed;
         private bool collected;
+        private bool hintStarted;
+        private Vector3 mainStarScale;
 
         public void Configure(SpriteRenderer cross, ParticleSystem stars, float radius)
         {
+            Configure(cross, stars, null, radius, float.NegativeInfinity);
+        }
+
+        public void Configure(SpriteRenderer cross, ParticleSystem stars, SpriteRenderer star, float radius, float triggerX)
+        {
             crossRenderer = cross;
             hintStars = stars;
+            mainStar = star;
             revealRadius = radius;
+            hintTriggerX = triggerX;
         }
 
         private void Start()
@@ -34,15 +45,45 @@ namespace TheFairyHills.Gameplay
                 color.a = 0f;
                 crossRenderer.color = color;
             }
-            if (hintStars != null && !hintStars.isPlaying) hintStars.Play();
+            if (hintStars != null) hintStars.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            if (mainStar != null)
+            {
+                mainStarScale = mainStar.transform.localScale;
+                mainStar.gameObject.SetActive(false);
+            }
         }
 
         private void Update()
         {
             if (collected) return;
             if (player == null) player = FindFirstObjectByType<PlayerController2D>();
-            if (player == null || revealed) return;
-            if (Vector2.Distance(player.transform.position, transform.position) > revealRadius) return;
+            if (player == null) return;
+
+            if (!hintStarted && player.transform.position.x > hintTriggerX)
+            {
+                hintStarted = true;
+                if (hintStars != null)
+                {
+                    if (revealed)
+                    {
+                        ParticleSystem.EmissionModule emission = hintStars.emission;
+                        emission.rateOverTime = new ParticleSystem.MinMaxCurve(1f, 1.5f);
+                    }
+                    hintStars.Play();
+                }
+                if (mainStar != null) mainStar.gameObject.SetActive(true);
+            }
+
+            if (hintStarted && mainStar != null)
+            {
+                float blink = (Mathf.Sin(Time.time * Mathf.PI * 2f / 0.3f) + 1f) * 0.5f;
+                Color color = mainStar.color;
+                color.a = Mathf.Lerp(0.22f, 1f, blink);
+                mainStar.color = color;
+                mainStar.transform.localScale = mainStarScale * Mathf.Lerp(0.8f, 1.08f, blink);
+            }
+
+            if (revealed || Vector2.Distance(player.transform.position, transform.position) > revealRadius) return;
 
             revealed = true;
             if (crossRenderer != null)
@@ -51,7 +92,11 @@ namespace TheFairyHills.Gameplay
                 color.a = 1f;
                 crossRenderer.color = color;
             }
-            if (hintStars != null) hintStars.Stop();
+            if (hintStars != null)
+            {
+                ParticleSystem.EmissionModule emission = hintStars.emission;
+                emission.rateOverTime = new ParticleSystem.MinMaxCurve(1f, 1.5f);
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D other)
