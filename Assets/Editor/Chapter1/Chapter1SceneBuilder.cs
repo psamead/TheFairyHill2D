@@ -66,12 +66,22 @@ namespace TheFairyHills.Editor
         public string type;
         public string label;
         public string sprite;
+        public string sprite_open;
+        public float image_x;
+        public float image_w;
+        public float image_h;
+        public float sorting_order;
+        public float blocker_x0;
+        public float blocker_x1;
+        public float blocker_h;
+        public float range_x0;
+        public float range_x1;
     }
 
     /// <summary>Builds the first two playable Chapter 1 graybox scenes from their approved JSON layouts.</summary>
     internal static class Chapter1SceneBuilder
     {
-        private const string VillageLayoutPath = "Assets/_Project/Data/Layouts/S1_Village_layout_v2.json";
+        private const string VillageLayoutPath = "Assets/_Project/Data/Layouts/S1_Village_layout_v3.json";
         private const string ForestLayoutPath = "Assets/_Project/Data/Layouts/S1b_ForestPath_layout_v3.json";
         private const string NiamhSpritePath = "Assets/_Project/Art/Characters/Niamh/Niamh_side_static_v3.png";
         private const string MenuScenePath = "Assets/Scenes/MainMenu.unity";
@@ -80,6 +90,8 @@ namespace TheFairyHills.Editor
         private const string FondamentoPath = "Assets/_Project/Fonts/Fondamento SDF.asset";
         private const string FramePath = "Assets/_Project/Art/UI/Frame/UI_frame_celtic.png";
         private const string SoftParticleMaterialPath = "Assets/_Project/Art/FX/M_FX_SoftParticle.mat";
+        private const string HudFramePath = "Assets/_Project/Art/UI/HUD/UI_frame_thin.png";
+        private const string HudPanelPath = "Assets/_Project/Art/UI/HUD/UI_panel_dark.png";
 
         [MenuItem("Tools/The Fairy Hills/Build Chapter 1 Scenes")]
         private static void BuildFromMenu() => BuildBothScenes();
@@ -108,6 +120,26 @@ namespace TheFairyHills.Editor
             Debug.Log("Built Ch1_S1_Village and Ch1_S1b_ForestPath from the approved layout JSON files.");
         }
 
+        [MenuItem("Tools/The Fairy Hills/Build Revision v3 Batch A - Village UI")]
+        private static void BuildRevisionV3BatchAVillageAndCore()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode before building Revision v3 Batch A.");
+
+            Scene activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.IsValid() && activeScene.isDirty)
+                throw new InvalidOperationException($"Save the dirty scene '{activeScene.path}' before building Revision v3 Batch A.");
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ConfigureBatchAVillageAssets();
+            Chapter1LayoutData village = LoadLayout(VillageLayoutPath);
+            BuildCoreScene(village.length);
+            BuildScene(village, VillageScenePath, false);
+            AssetDatabase.SaveAssets();
+            EditorSceneManager.OpenScene(MenuScenePath, OpenSceneMode.Single);
+            Debug.Log("Built Revision v3 Batch A: Core_Persistent HUD and S1 Village gate. Forest, MainMenu, and Build Settings were left unchanged.");
+        }
+
         private static void ConfigureRevisionAssets()
         {
             string[] spritePaths =
@@ -124,6 +156,7 @@ namespace TheFairyHills.Editor
                 "Assets/_Project/Art/UI/Frame/UI_frame_celtic_stone.png"
             };
             foreach (string path in spritePaths) ConfigureSpriteImport(path, false, true);
+            ConfigureBatchAVillageAssets();
             ConfigureSpriteImport("Assets/_Project/Art/Backgrounds/S1_Village/S1_Village_L4_Fore_v2.png", true, true);
             ConfigureSpriteImport("Assets/_Project/Art/Backgrounds/S1b_ForestPath/S1b_ForestPath_L3b_GrassEdge.png", true, true);
             TextureImporter frameImporter = AssetImporter.GetAtPath(FramePath) as TextureImporter;
@@ -145,6 +178,28 @@ namespace TheFairyHills.Editor
             material.SetFloat("_Blend", 0f);
             material.SetColor("_BaseColor", new Color(0.055f, 0.025f, 0.07f, 0.6f));
             EditorUtility.SetDirty(material);
+        }
+
+        private static void ConfigureBatchAVillageAssets()
+        {
+            string[] spritePaths =
+            {
+                HudFramePath,
+                HudPanelPath,
+                "Assets/_Project/Art/Backgrounds/S1_Village/props/S1_prop_gate_closed_v3.png",
+                "Assets/_Project/Art/Backgrounds/S1_Village/props/S1_prop_gate_open_v3.png"
+            };
+            foreach (string path in spritePaths)
+                ConfigureSpriteImport(path, false, false);
+
+            foreach (string path in new[] { HudFramePath, HudPanelPath })
+            {
+                TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (importer == null) throw new InvalidOperationException($"HUD texture importer missing at {path}.");
+                importer.spriteBorder = new Vector4(24f, 24f, 24f, 24f);
+                importer.textureCompression = TextureImporterCompression.Uncompressed;
+                importer.SaveAndReimport();
+            }
         }
 
         private static void BuildCoreScene(float initialLength)
@@ -432,27 +487,30 @@ namespace TheFairyHills.Editor
 
             TMP_Text controls = CreateHudText("Controls", canvasObject.transform, font,
                 "A / D or ← / → move     Shift run     Space jump     E interact     Q IronPulse", 24f,
-                TextAlignmentOptions.TopLeft);
-            SetTopLeft(controls.rectTransform, 36f, 30f, 1450f, 48f);
-            controls.color = new Color(0.95f, 0.89f, 0.73f, 0.92f);
-            CreateUiFramePanel(canvasObject.transform, "ControlsFrame", Vector2.up, new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(730f, -52f), new Vector2(1500f, 82f), false);
-
-            TMP_Text prompt = CreateHudText("Interaction Prompt", canvasObject.transform, font, string.Empty, 30f,
                 TextAlignmentOptions.Center);
-            SetAnchored(prompt.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
-                new Vector2(0.5f, 0f), new Vector2(0f, 85f), new Vector2(900f, 55f));
-            prompt.color = new Color(0.98f, 0.86f, 0.58f, 1f);
-            GameObject promptPanel = CreateUiFramePanel(canvasObject.transform, "PromptFrame", new Vector2(0.5f, 0f),
-                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 62f), new Vector2(970f, 88f), true);
+            controls.color = new Color(0.95f, 0.89f, 0.73f, 0.92f);
+            Vector2 controlsSize = controls.GetPreferredValues(controls.text);
+            GameObject controlsPanel = CreateUiFramePanel(canvasObject.transform, "ControlsFrame", Vector2.up,
+                Vector2.up, new Vector2(0f, 1f), new Vector2(24f, -24f), controlsSize + new Vector2(24f, 24f), false);
+            controls.transform.SetParent(controlsPanel.transform, false);
+            SetAnchored(controls.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f), Vector2.zero, controlsSize);
 
-            TMP_Text message = CreateHudText("Chapter Message", canvasObject.transform, font, string.Empty, 32f,
+            GameObject promptPanel = CreateUiFramePanel(canvasObject.transform, "PromptFrame", new Vector2(0.5f, 0f),
+                new Vector2(0.5f, 0f), new Vector2(0.5f, 0.5f), new Vector2(0f, 85f), new Vector2(24f, 24f), true);
+            TMP_Text prompt = CreateHudText("Interaction Prompt", promptPanel.transform, font, string.Empty, 30f,
+                TextAlignmentOptions.Center);
+            SetAnchored(prompt.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.one);
+            prompt.color = new Color(0.98f, 0.86f, 0.58f, 1f);
+
+            GameObject messagePanel = CreateUiFramePanel(canvasObject.transform, "MessageFrame", new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -360f), new Vector2(24f, 24f), true);
+            TMP_Text message = CreateHudText("Chapter Message", messagePanel.transform, font, string.Empty, 32f,
                 TextAlignmentOptions.Center);
             SetAnchored(message.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -360f), new Vector2(1300f, 100f));
+                new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.one);
             message.color = new Color(0.98f, 0.86f, 0.58f, 1f);
-            GameObject messagePanel = CreateUiFramePanel(canvasObject.transform, "MessageFrame", new Vector2(0.5f, 0.5f),
-                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -360f), new Vector2(1370f, 140f), true);
 
             ChapterHUD hud = canvasObject.AddComponent<ChapterHUD>();
             hud.Configure(prompt, message, promptPanel, messagePanel);
@@ -470,16 +528,16 @@ namespace TheFairyHills.Editor
             dark.transform.SetParent(panel.transform, false);
             StretchRect(dark.GetComponent<RectTransform>());
             Image darkImage = dark.GetComponent<Image>();
-            darkImage.color = new Color(0.01f, 0.025f, 0.045f, 0.66f);
+            darkImage.sprite = LoadSprite(HudPanelPath);
+            darkImage.type = Image.Type.Sliced;
+            darkImage.color = new Color(1f, 1f, 1f, 0.6f);
             darkImage.raycastTarget = false;
-            GameObject frame = new GameObject("Celtic Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            GameObject frame = new GameObject("Thin HUD Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             frame.transform.SetParent(panel.transform, false);
             StretchRect(frame.GetComponent<RectTransform>());
             Image frameImage = frame.GetComponent<Image>();
-            frameImage.sprite = LoadSprite(FramePath);
-            frameImage.type = Image.Type.Tiled;
-            frameImage.fillCenter = false;
-            frameImage.pixelsPerUnitMultiplier = 3.5f;
+            frameImage.sprite = LoadSprite(HudFramePath);
+            frameImage.type = Image.Type.Sliced;
             frameImage.raycastTarget = false;
             panel.SetActive(!initiallyHidden);
             return panel;
@@ -562,34 +620,29 @@ namespace TheFairyHills.Editor
         private static void CreateVillageGate(Chapter1InteractData interaction)
         {
             GameObject root = new GameObject("Village Gate");
-            root.transform.position = new Vector3(24f, interaction.y, 0f);
-            SpriteRenderer left = CreateGatePart(root.transform, "Gate Post Left", "S1_prop_gate_post_L.png", 0f, -5, 1.12f);
-            SpriteRenderer boards = CreateGatePart(root.transform, "Gate Boards", "S1_prop_gate_boards.png", 1.04f, -5, 2.88f);
-            CreateGatePart(root.transform, "Gate Post Right", "S1_prop_gate_post_R.png", 3.84f, 15, 0.98f);
+            root.transform.position = new Vector3(interaction.x, interaction.y, 0f);
+            string folder = "Assets/_Project/Art/Backgrounds/S1_Village/";
+            Sprite closedSprite = LoadSprite(folder + interaction.sprite);
+            Sprite openSprite = LoadSprite(folder + interaction.sprite_open);
+            SpriteRenderer gateRenderer = CreateScaledSprite(root.transform, closedSprite,
+                interaction.image_w, interaction.image_h, Mathf.RoundToInt(interaction.sorting_order));
+            gateRenderer.transform.localPosition = new Vector3(interaction.image_x - interaction.x, 0f, 0f);
 
             BoxCollider2D blocker = root.AddComponent<BoxCollider2D>();
-            blocker.size = new Vector2(0.3f, 8f);
-            blocker.offset = new Vector2(2.5f, 4f);
+            blocker.size = new Vector2(interaction.blocker_x1 - interaction.blocker_x0, interaction.blocker_h);
+            blocker.offset = new Vector2((interaction.blocker_x0 + interaction.blocker_x1) * 0.5f - interaction.x,
+                interaction.blocker_h * 0.5f);
             VillageGate gate = root.AddComponent<VillageGate>();
-            gate.Configure(boards, blocker);
+            gate.Configure(gateRenderer, closedSprite, openSprite, blocker);
 
             GameObject range = new GameObject("Gate Close Range");
             range.transform.SetParent(root.transform, false);
-            range.transform.localPosition = new Vector3(2.5f, 4f, 0f);
+            range.transform.localPosition = new Vector3((interaction.range_x0 + interaction.range_x1) * 0.5f - interaction.x,
+                interaction.blocker_h * 0.5f, 0f);
             BoxCollider2D trigger = range.AddComponent<BoxCollider2D>();
             trigger.isTrigger = true;
-            trigger.size = new Vector2(8.8f, 8f);
+            trigger.size = new Vector2(interaction.range_x1 - interaction.range_x0, interaction.blocker_h);
             range.AddComponent<GateRangeTrigger>().Configure(gate);
-        }
-
-        private static SpriteRenderer CreateGatePart(Transform parent, string name, string file, float x, int order, float width)
-        {
-            GameObject part = new GameObject(name);
-            part.transform.SetParent(parent, false);
-            part.transform.localPosition = new Vector3(x, 0f, 0f);
-            SpriteRenderer renderer = CreateScaledSprite(part.transform,
-                LoadSprite("Assets/_Project/Art/Backgrounds/S1_Village/props/" + file), width, 2.4f, order);
-            return renderer;
         }
 
         private static void CreateIronCross(Chapter1InteractData interaction)

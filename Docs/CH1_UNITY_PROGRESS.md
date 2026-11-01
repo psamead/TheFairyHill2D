@@ -105,3 +105,10 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 
 - After the Revision v3 implementation attempt, the user reported a problem and requested a return to the pre-task project state. The v3-only scene, asset, script, test, and project-setting changes were rolled back; the earlier Niamh collider update and other pre-existing project changes were preserved.
 - The problem's specific symptom and reproduction steps were not provided, so its cause was not diagnosed. Revision v3 implementation changes were not published to GitHub; the published update is the Niamh collision progress note only.
+
+## Revision v3 — Batch A: Village UI (2026-11-01)
+
+- Imported the two v3 gate sprites and HUD sprites as single sprites at 100 PPU with uncompressed texture data. Set 24 px 9-slice borders on the two 96×96 HUD sprites.
+- Updated the builder to read `S1_Village_layout_v3.json`, create one closed/open gate sprite with JSON-driven blocker/range, and create fitted dark-backed thin-frame HUD panels. The controls hint and interaction/message panels use 12 px padding; Core has no Celtic HUD frame. The MainMenu Settings frame remains unchanged.
+- Rebuilt and saved only `Core_Persistent` and `Ch1_S1_Village`. Preserved Niamh's capsule (Size `(0.23, 2.08)`, Offset `(0.08, 1.04)`). Build Settings stayed at four scenes; the exit at x=37.8 still targets `Ch1_S1b_ForestPath`. Forest and MainMenu scene files were not changed.
+- Missing-script scan found 0 components in Core, Village, Forest, and MainMenu. Unity Editor compilation and scene generation succeeded. The first build attempt exposed a duplicated `props/` path; it was corrected and the rebuild succeeded. No automated tests were run per the Batch A rule. Manual Play Mode checks remain pending for HUD appearance, gate open/close, and the Village-to-Forest transition.

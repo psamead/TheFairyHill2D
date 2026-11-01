@@ -6,13 +6,20 @@ namespace TheFairyHills.Gameplay
     public sealed class VillageGate : PlayerInteractionTarget
     {
         [SerializeField] private SpriteRenderer boards;
+        [SerializeField] private Sprite closedSprite;
+        [SerializeField] private Sprite openSprite;
         [SerializeField] private Collider2D blocker;
         private bool opened;
 
-        public void Configure(SpriteRenderer gateBoards, Collider2D invisibleWall)
+        public void Configure(SpriteRenderer gateRenderer, Sprite closed, Sprite open, Collider2D invisibleWall)
         {
-            boards = gateBoards;
+            boards = gateRenderer;
+            closedSprite = closed;
+            openSprite = open;
             blocker = invisibleWall;
+            if (boards != null) boards.sprite = closedSprite;
+            if (boards != null) boards.enabled = true;
+            if (blocker != null) blocker.enabled = true;
             SetPrompt("Press E to push open the gate");
         }
 
@@ -22,7 +29,7 @@ namespace TheFairyHills.Gameplay
         {
             if (opened) return;
             opened = true;
-            if (boards != null) boards.enabled = false;
+            if (boards != null) boards.sprite = openSprite;
             if (blocker != null) blocker.enabled = false;
             if (player != null) player.ShowMessage("The gate swings open.");
         }
@@ -31,7 +38,7 @@ namespace TheFairyHills.Gameplay
         {
             if (!opened) return;
             opened = false;
-            if (boards != null) boards.enabled = true;
+            if (boards != null) boards.sprite = closedSprite;
             if (blocker != null) blocker.enabled = true;
         }
     }

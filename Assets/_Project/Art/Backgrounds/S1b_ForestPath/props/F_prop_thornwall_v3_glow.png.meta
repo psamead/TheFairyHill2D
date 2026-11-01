@@ -1,0 +1,416 @@
+fileFormatVersion: 2
+guid: 340f2792b9caf7f48999467123d98a8d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 532852762176940481
+    second: F_prop_thornwall_v3_glow_0
+  - first:
+      213: 8170082391052501683
+    second: F_prop_thornwall_v3_glow_1
+  - first:
+      213: 2677567557311543738
+    second: F_prop_thornwall_v3_glow_2
+  - first:
+      213: 3450699420972316114
+    second: F_prop_thornwall_v3_glow_3
+  - first:
+      213: -5157423355148661954
+    second: F_prop_thornwall_v3_glow_4
+  - first:
+      213: -5494251469971235652
+    second: F_prop_thornwall_v3_glow_5
+  - first:
+      213: 7959619527749018377
+    second: F_prop_thornwall_v3_glow_6
+  - first:
+      213: -35745045477856138
+    second: F_prop_thornwall_v3_glow_7
+  - first:
+      213: -7625860291494609374
+    second: F_prop_thornwall_v3_glow_8
+  - first:
+      213: -6653896348050183217
+    second: F_prop_thornwall_v3_glow_9
+  - first:
+      213: 5293607859545741228
+    second: F_prop_thornwall_v3_glow_10
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_0
+      rect:
+        serializedVersion: 2
+        x: 490
+        y: 884
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c9642793c2156700800000000000000
+      internalID: 532852762176940481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_1
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 865
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b2cb50d5a6f16170800000000000000
+      internalID: 8170082391052501683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_2
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 858
+        width: 22
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab93aabc181a82520800000000000000
+      internalID: 2677567557311543738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_3
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 0
+        width: 1020
+        height: 855
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d573bd37d853ef20800000000000000
+      internalID: 3450699420972316114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_4
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 845
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3b8f00a8c62d68b0800000000000000
+      internalID: -5157423355148661954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_5
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 816
+        width: 26
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbc52b9d56f70c3b0800000000000000
+      internalID: -5494251469971235652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_6
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 833
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9032eb2e9cf367e60800000000000000
+      internalID: 7959619527749018377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_7
+      rect:
+        serializedVersion: 2
+        x: 634
+        y: 827
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67cefcd0212018ff0800000000000000
+      internalID: -35745045477856138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_8
+      rect:
+        serializedVersion: 2
+        x: 1056
+        y: 636
+        width: 19
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22ef4bae7708b2690800000000000000
+      internalID: -7625860291494609374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_9
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 529
+        width: 48
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcb233a768c98a3a0800000000000000
+      internalID: -6653896348050183217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: F_prop_thornwall_v3_glow_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 513
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca790703d4ca67940800000000000000
+      internalID: 5293607859545741228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      F_prop_thornwall_v3_glow_0: 532852762176940481
+      F_prop_thornwall_v3_glow_1: 8170082391052501683
+      F_prop_thornwall_v3_glow_10: 5293607859545741228
+      F_prop_thornwall_v3_glow_2: 2677567557311543738
+      F_prop_thornwall_v3_glow_3: 3450699420972316114
+      F_prop_thornwall_v3_glow_4: -5157423355148661954
+      F_prop_thornwall_v3_glow_5: -5494251469971235652
+      F_prop_thornwall_v3_glow_6: 7959619527749018377
+      F_prop_thornwall_v3_glow_7: -35745045477856138
+      F_prop_thornwall_v3_glow_8: -7625860291494609374
+      F_prop_thornwall_v3_glow_9: -6653896348050183217
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
