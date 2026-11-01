@@ -401,8 +401,9 @@ namespace TheFairyHills.Editor
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             CapsuleCollider2D capsule = playerObject.GetComponent<CapsuleCollider2D>();
             capsule.direction = CapsuleDirection2D.Vertical;
-            capsule.size = new Vector2(0.7f, 1.9f);
-            capsule.offset = new Vector2(0f, 0.95f);
+            // Preserve the manually tuned capsule saved in Core_Persistent.unity.
+            capsule.size = new Vector2(0.23f, 2.08f);
+            capsule.offset = new Vector2(0.08f, 1.04f);
 
             GameObject visual = new GameObject("Niamh Static Sprite");
             visual.transform.SetParent(playerObject.transform, false);
