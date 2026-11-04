@@ -27,7 +27,9 @@ namespace TheFairyHills.Editor
         public Chapter1PitData[] pits;
         public Chapter1BlockData[] blocks;
         public Chapter1InteractData[] interact;
+        public float[][] lights;
         public Chapter1ForestLayers layers;
+        public Chapter1ForestLightFxData light_fx;
     }
 
     [Serializable]
@@ -86,7 +88,10 @@ namespace TheFairyHills.Editor
     [Serializable]
     internal sealed class Chapter1ForestLayers
     {
+        public Chapter1ForestLayerData L0_sky;
+        public Chapter1ForestLayerData L1_far;
         public Chapter1ForestLayerData L2_undergrowth;
+        public Chapter1ForestLayerData L3_walk;
         public Chapter1ForestLayerData L3b_grass_edge;
         public Chapter1ForestLayerData L4_fore;
     }
@@ -98,6 +103,29 @@ namespace TheFairyHills.Editor
         public float parallax;
         public int sorting_order;
         public float alpha = 1f;
+        public bool unlit;
+        public string tint;
+    }
+
+    [Serializable]
+    internal sealed class Chapter1ForestLightFxData
+    {
+        public Chapter1LightData clover;
+        public Chapter1LightData cross;
+        public Chapter1LightData thornwall;
+        public Chapter1LightData exit;
+    }
+
+    [Serializable]
+    internal sealed class Chapter1LightData
+    {
+        public string color;
+        public float intensity;
+        public float radius;
+        public float inner_radius;
+        public float falloff_intensity;
+        public string sprite;
+        public float sprite_size;
     }
 
     /// <summary>Builds the first two playable Chapter 1 graybox scenes from their approved JSON layouts.</summary>
@@ -200,6 +228,27 @@ namespace TheFairyHills.Editor
             BuildScene(forest, ForestScenePath, true);
             AssetDatabase.SaveAssets();
             Debug.Log("Built Revision v3 Fix A1/B1: Village and Forest only. Core, MainMenu, and Build Settings were left unchanged.");
+        }
+
+        [MenuItem("Tools/The Fairy Hills/Build Revision v3 Fix B2 B3")]
+        private static void BuildRevisionV3FixB2B3()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode before building Revision v3 Fix B2/B3.");
+
+            Scene activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.IsValid() && activeScene.isDirty)
+                throw new InvalidOperationException($"Save the dirty scene '{activeScene.path}' before building Revision v3 Fix B2/B3.");
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ConfigureBatchBForestAssets();
+            ConfigureThornGlowMaterial();
+            Chapter1LayoutData village = LoadLayout(VillageLayoutPath);
+            Chapter1LayoutData forest = LoadLayout(ForestLayoutPath);
+            BuildCoreScene(village.length);
+            BuildScene(forest, ForestScenePath, true);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Built Revision v3 Fix B2/B3: Core_Persistent and Forest only. Village, MainMenu, and Build Settings were left unchanged.");
         }
 
         private static void ConfigureBatchBForestAssets()
@@ -339,7 +388,7 @@ namespace TheFairyHills.Editor
         {
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             Camera camera = CreateCamera(initialLength);
-            CreateGlobalLight2D();
+            Light2D globalLight = CreateGlobalLight2D();
             ChapterHUD hud = CreateHud();
             GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
             InputSystemUIInputModule uiModule = eventSystem.GetComponent<InputSystemUIInputModule>();
@@ -352,23 +401,43 @@ namespace TheFairyHills.Editor
             uiModule.leftClick = LoadInputReference("MainMenu-Click");
             uiModule.scrollWheel = LoadInputReference("MainMenu-ScrollWheel");
             PlayerController2D player = CreatePlayer(3.5f, initialLength, hud);
+            Light2D playerLight = CreatePlayerLight(player.transform);
             CameraFollow(camera, player.transform, initialLength);
             GameObject stateObject = new GameObject("GameState");
             stateObject.AddComponent<GameState>();
             ChapterSceneLoader loader = new GameObject("SceneLoader").AddComponent<ChapterSceneLoader>();
-            loader.Configure(player, camera.GetComponent<ChapterCameraFollow>(), hud);
+            loader.Configure(player, camera.GetComponent<ChapterCameraFollow>(), hud, globalLight, playerLight);
             if (!EditorSceneManager.SaveScene(scene, "Assets/Scenes/Core_Persistent.unity"))
                 throw new InvalidOperationException("Could not save Core_Persistent scene.");
             AssetDatabase.ImportAsset("Assets/Scenes/Core_Persistent.unity", ImportAssetOptions.ForceSynchronousImport);
         }
 
-        private static void CreateGlobalLight2D()
+        private static Light2D CreateGlobalLight2D()
         {
             GameObject lightObject = new GameObject("Global Light 2D");
             Light2D light = lightObject.AddComponent<Light2D>();
             light.lightType = Light2D.LightType.Global;
             light.color = Color.white;
             light.intensity = 1f;
+            light.shadowsEnabled = false;
+            return light;
+        }
+
+        private static Light2D CreatePlayerLight(Transform player)
+        {
+            GameObject lightObject = new GameObject("Niamh_Light");
+            lightObject.transform.SetParent(player, false);
+            lightObject.transform.localPosition = new Vector3(0f, 1.2f, 0f);
+            Light2D light = lightObject.AddComponent<Light2D>();
+            light.lightType = Light2D.LightType.Point;
+            light.color = new Color32(255, 226, 184, 255);
+            light.intensity = 1.2f;
+            light.pointLightInnerRadius = 0.8f;
+            light.pointLightOuterRadius = 5.5f;
+            light.falloffIntensity = 0.7f;
+            light.shadowsEnabled = false;
+            light.enabled = false;
+            return light;
         }
 
         private static InputActionReference LoadInputReference(string name) =>
@@ -379,7 +448,10 @@ namespace TheFairyHills.Editor
             if (!File.Exists(path)) throw new FileNotFoundException("Chapter 1 layout JSON is missing.", path);
             Chapter1LayoutData layout = JsonUtility.FromJson<Chapter1LayoutData>(File.ReadAllText(path));
             if (layout != null)
+            {
                 layout.ground = ParseGroundSegments(File.ReadAllText(path));
+                layout.lights = ParseLightCoordinates(File.ReadAllText(path));
+            }
             if (layout == null || string.IsNullOrEmpty(layout.id) || layout.length <= 0f || layout.ground == null)
                 throw new InvalidDataException($"Layout JSON is incomplete: {path}");
             return layout;
@@ -405,6 +477,24 @@ namespace TheFairyHills.Editor
                 };
             }
             return segments;
+        }
+
+        private static float[][] ParseLightCoordinates(string json)
+        {
+            Match lights = Regex.Match(json, @"""lights""\s*:\s*\[(.*?)\]\s*,\s*""mid""", RegexOptions.Singleline);
+            if (!lights.Success) return Array.Empty<float[]>();
+            MatchCollection points = Regex.Matches(lights.Groups[1].Value,
+                @"\[\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\]");
+            var coordinates = new float[points.Count][];
+            for (int i = 0; i < points.Count; i++)
+            {
+                coordinates[i] = new[]
+                {
+                    float.Parse(points[i].Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture),
+                    float.Parse(points[i].Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture)
+                };
+            }
+            return coordinates;
         }
 
         private static void ConfigureSpriteImports()
@@ -470,8 +560,9 @@ namespace TheFairyHills.Editor
             CreateBackdropLayers(layout, null, forest);
             CreateGroundAndPits(layout);
             LevelInfo info = new GameObject("LevelInfo").AddComponent<LevelInfo>();
+            Color ambientColor = forest ? new Color32(104, 120, 160, 255) : Color.white;
             info.Configure(forest ? "Ch1_S1b_ForestPath" : "Ch1_S1_Village", layout.length,
-                forest ? "MainMenu" : "Ch1_S1b_ForestPath");
+                forest ? "MainMenu" : "Ch1_S1b_ForestPath", ambientColor, forest ? 0.28f : 1f, forest);
             new GameObject("LevelBootstrap").AddComponent<LevelBootstrap>();
             float startX = forest ? 3.5f : 3.5f;
             foreach (Chapter1InteractData interaction in layout.interact ?? Array.Empty<Chapter1InteractData>())
@@ -484,12 +575,22 @@ namespace TheFairyHills.Editor
             spawnPrevious.AddComponent<SpawnPoint>().Configure("Spawn_FromPrevious");
 
             foreach (Chapter1BlockData block in layout.blocks ?? Array.Empty<Chapter1BlockData>())
-                CreateBlock(layout.id, block);
+                CreateBlock(layout.id, block, forest ? layout.light_fx : null);
             foreach (Chapter1InteractData interaction in layout.interact ?? Array.Empty<Chapter1InteractData>())
             {
                 if (interaction.type == "reach") CreateVillageGate(interaction);
-                else if (interaction.type == "pickup_low") CreateIronCross(interaction);
-                else if (interaction.type == "exit") CreateSceneExit(interaction, forest);
+                else if (interaction.type == "pickup_low") CreateIronCross(interaction, forest ? layout.light_fx : null);
+                else if (interaction.type == "exit") CreateSceneExit(interaction, forest, forest ? layout.light_fx : null);
+            }
+
+            if (forest)
+            {
+                CreateForestHelperLights(layout);
+                ThornWall wall = UnityEngine.Object.FindFirstObjectByType<ThornWall>();
+                GameObject exitObject = GameObject.Find("Exit_To_S2");
+                Light2D exitLight = exitObject != null ? exitObject.GetComponentInChildren<Light2D>(true) : null;
+                if (wall != null && exitLight != null && layout.light_fx != null && layout.light_fx.exit != null)
+                    wall.ConfigureExitLight(exitLight, layout.light_fx.exit.intensity);
             }
 
             if (!EditorSceneManager.SaveScene(scene, scenePath))
@@ -520,19 +621,19 @@ namespace TheFairyHills.Editor
         {
             if (forest)
             {
-                CreateLayer("L0_Sky", "Assets/_Project/Art/Backgrounds/S1b_ForestPath/S1b_ForestPath_L0_Sky_wip.png", -50, 0.05f, camera);
-                CreateLayer("L1_Far", "Assets/_Project/Art/Backgrounds/S1b_ForestPath/S1b_ForestPath_L1_Far_wip.png", -40, 0.4f, camera);
                 Chapter1ForestLayers layers = layout.layers;
-                if (layers == null || layers.L2_undergrowth == null || layers.L3b_grass_edge == null || layers.L4_fore == null)
+                if (layers == null || layers.L0_sky == null || layers.L1_far == null || layers.L2_undergrowth == null ||
+                    layers.L3_walk == null || layers.L3b_grass_edge == null || layers.L4_fore == null)
                     throw new InvalidDataException("Forest v4 layout is missing its layer definitions.");
                 string folder = "Assets/_Project/Art/Backgrounds/S1b_ForestPath/";
+                CreateForestLayer("L0_Sky", folder + layers.L0_sky.sprite, layers.L0_sky, -50, 0.05f, camera);
+                CreateForestLayer("L1_Far", folder + layers.L1_far.sprite, layers.L1_far, -40, 0.4f, camera);
                 CreateLayer("L2_Undergrowth", folder + layers.L2_undergrowth.sprite,
-                    LayerOrder(layers.L2_undergrowth.sorting_order, -20), layers.L2_undergrowth.parallax, camera, layers.L2_undergrowth.alpha);
-                CreateLayer("L3_Walk", "Assets/_Project/Art/Backgrounds/S1b_ForestPath/S1b_ForestPath_L3_Walk_ditch_v2.png", -10, 1f, camera);
-                CreateLayer("L3b_GrassEdge", folder + layers.L3b_grass_edge.sprite,
-                    LayerOrder(layers.L3b_grass_edge.sorting_order, -9), layers.L3b_grass_edge.parallax, camera, layers.L3b_grass_edge.alpha);
-                CreateLayer("L4_Fore", folder + layers.L4_fore.sprite,
-                    LayerOrder(layers.L4_fore.sorting_order, 20), layers.L4_fore.parallax, camera, layers.L4_fore.alpha);
+                    LayerOrder(layers.L2_undergrowth.sorting_order, -20), layers.L2_undergrowth.parallax, camera,
+                    layers.L2_undergrowth.alpha, layers.L2_undergrowth.unlit, layers.L2_undergrowth.tint);
+                CreateForestLayer("L3_Walk", folder + layers.L3_walk.sprite, layers.L3_walk, -10, 1f, camera);
+                CreateForestLayer("L3b_GrassEdge", folder + layers.L3b_grass_edge.sprite, layers.L3b_grass_edge, -9, 1f, camera);
+                CreateForestLayer("L4_Fore", folder + layers.L4_fore.sprite, layers.L4_fore, 20, 1.15f, camera);
             }
             else
             {
@@ -544,7 +645,15 @@ namespace TheFairyHills.Editor
             }
         }
 
-        private static void CreateLayer(string name, string path, int order, float factor, Camera camera, float alpha = 1f)
+        private static void CreateForestLayer(string name, string path, Chapter1ForestLayerData data,
+            int fallbackOrder, float fallbackParallax, Camera camera)
+        {
+            CreateLayer(name, path, LayerOrder(data.sorting_order, fallbackOrder),
+                data.parallax > 0f ? data.parallax : fallbackParallax, camera, data.alpha, data.unlit, data.tint);
+        }
+
+        private static void CreateLayer(string name, string path, int order, float factor, Camera camera,
+            float alpha = 1f, bool unlit = false, string tint = null)
         {
             Sprite sprite = LoadSprite(path);
             GameObject layer = new GameObject(name);
@@ -552,7 +661,10 @@ namespace TheFairyHills.Editor
             SpriteRenderer renderer = layer.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
             renderer.sortingOrder = order;
-            Color layerColor = renderer.color;
+            if (unlit) renderer.sharedMaterial = GetSpriteUnlitMaterial();
+            if (!string.IsNullOrEmpty(tint) && !ColorUtility.TryParseHtmlString(tint, out _))
+                throw new InvalidDataException($"Layer '{name}' has invalid tint '{tint}'.");
+            Color layerColor = string.IsNullOrEmpty(tint) ? Color.white : ParseHtmlColor(tint);
             layerColor.a = alpha;
             renderer.color = layerColor;
             layer.AddComponent<ParallaxLayer>().Configure(camera, factor);
@@ -719,7 +831,7 @@ namespace TheFairyHills.Editor
             return textComponent;
         }
 
-        private static void CreateBlock(string layoutId, Chapter1BlockData block)
+        private static void CreateBlock(string layoutId, Chapter1BlockData block, Chapter1ForestLightFxData lightFx)
         {
             string folder = layoutId == "S1_Village" ?
                 "Assets/_Project/Art/Backgrounds/S1_Village/" : "Assets/_Project/Art/Backgrounds/S1b_ForestPath/";
@@ -766,18 +878,20 @@ namespace TheFairyHills.Editor
                     glow = CreateScaledSprite(root.transform, glowSprite, block.w, block.h, order + 1);
                     glow.gameObject.name = "Red Glow Overlay";
                     glow.sharedMaterial = GetThornGlowMaterial(glowSprite.texture);
-                    glow.color = new Color32(176, 32, 42, 128);
+                    glow.color = Color.white;
                     GameObject lightObject = new GameObject("Thorn Wall Red Point Light");
                     lightObject.transform.SetParent(root.transform, false);
                     lightObject.transform.localPosition = effectCenter;
                     redLight = lightObject.AddComponent<Light2D>();
                     redLight.lightType = Light2D.LightType.Point;
-                    redLight.color = new Color32(176, 32, 42, 255);
-                    redLight.pointLightOuterRadius = 6f;
-                    redLight.intensity = 0.45f;
+                    Chapter1LightData redSettings = lightFx != null ? lightFx.thornwall : null;
+                    redLight.color = ParseHtmlColor(redSettings != null ? redSettings.color : "#B0202A");
+                    redLight.pointLightOuterRadius = redSettings != null ? redSettings.radius : 7f;
+                    redLight.intensity = (redSettings != null ? redSettings.intensity : 1.2f) * 0.5f;
                     redLight.shadowsEnabled = false;
                 }
-                root.AddComponent<ThornWall>().Configure(renderer, barrier, smoke, glow, redLight);
+                root.AddComponent<ThornWall>().Configure(renderer, barrier, smoke, glow, redLight,
+                    lightFx != null && lightFx.thornwall != null ? lightFx.thornwall.intensity : 1.2f);
             }
         }
 
@@ -827,7 +941,7 @@ namespace TheFairyHills.Editor
             range.AddComponent<GateRangeTrigger>().Configure(gate);
         }
 
-        private static void CreateIronCross(Chapter1InteractData interaction)
+        private static void CreateIronCross(Chapter1InteractData interaction, Chapter1ForestLightFxData lightFx)
         {
             string path = "Assets/_Project/Art/Backgrounds/S1b_ForestPath/props/F_prop_cross_v2.png";
             GameObject pickup = new GameObject("IronCrossPickup_FamilyHeirloom");
@@ -842,7 +956,17 @@ namespace TheFairyHills.Editor
             ParticleSystem stars = CreateSparkleHint(pickup.transform);
             SpriteRenderer mainStar = CreateMainStar(pickup.transform, interaction.sorting_order == 0f ? 11 :
                 Mathf.RoundToInt(interaction.sorting_order));
-            pickup.AddComponent<IronCrossPickup>().Configure(cross, stars, mainStar, 2.5f, interaction.hint_trigger_x);
+            Chapter1LightData lightSettings = lightFx != null ? lightFx.cross : null;
+            Light2D crossLight = null;
+            if (lightSettings != null)
+            {
+                GameObject lightObject = new GameObject("Iron Cross Warm Point Light");
+                lightObject.transform.SetParent(pickup.transform, false);
+                lightObject.transform.position = cross.bounds.center;
+                crossLight = ConfigurePointLight(lightObject, lightSettings, false);
+            }
+            pickup.AddComponent<IronCrossPickup>().Configure(cross, stars, mainStar, crossLight,
+                lightSettings != null ? lightSettings.intensity : 0.8f, 2.5f, interaction.hint_trigger_x);
         }
 
         private static ParticleSystem CreateSparkleHint(Transform parent)
@@ -911,15 +1035,74 @@ namespace TheFairyHills.Editor
             return material;
         }
 
-        private static void CreateSceneExit(Chapter1InteractData interaction, bool forest)
+        private static void CreateSceneExit(Chapter1InteractData interaction, bool forest,
+            Chapter1ForestLightFxData lightFx)
         {
             GameObject exit = new GameObject(forest ? "Exit_To_S2" : "Exit_To_ForestPath");
             exit.transform.position = new Vector3(interaction.x, interaction.y + 1.2f, 0f);
+            if (forest && lightFx != null && lightFx.exit != null)
+            {
+                GameObject lightObject = new GameObject("Forest Exit Purple Point Light");
+                lightObject.transform.SetParent(exit.transform, false);
+                lightObject.transform.localPosition = new Vector3(59f - interaction.x, 1.5f - (interaction.y + 1.2f), -0.1f);
+                ConfigurePointLight(lightObject, lightFx.exit, false);
+            }
             BoxCollider2D trigger = exit.AddComponent<BoxCollider2D>();
             trigger.isTrigger = true;
             trigger.size = forest ? new Vector2(2f, 2.4f) : new Vector2(1.4f, 2.4f);
             ChapterSceneExit sceneExit = exit.AddComponent<ChapterSceneExit>();
             sceneExit.Configure(forest ? string.Empty : "Ch1_S1b_ForestPath", forest, forest, "Spawn_FromVillage");
+        }
+
+        private static void CreateForestHelperLights(Chapter1LayoutData layout)
+        {
+            if (layout.light_fx == null || layout.light_fx.clover == null)
+                throw new InvalidDataException("Forest layout is missing the light_fx.clover configuration.");
+            string dotPath = Path.Combine("Assets/_Project/Art/FX", layout.light_fx.clover.sprite).Replace('\\', '/');
+            Sprite softDot = LoadSprite(dotPath);
+            Material softDotMaterial = GetSoftDotAdditiveMaterial(softDot.texture);
+            int count = 0;
+            foreach (float[] coordinate in layout.lights ?? Array.Empty<float[]>())
+            {
+                if (coordinate == null || coordinate.Length < 2) continue;
+                count++;
+                var lightObject = new GameObject($"Clover Point Light {count:00}");
+                lightObject.transform.position = new Vector3(coordinate[0], coordinate[1], -0.1f);
+                ConfigurePointLight(lightObject, layout.light_fx.clover, true);
+
+                SpriteRenderer dot = CreateScaledSprite(lightObject.transform, softDot,
+                    layout.light_fx.clover.sprite_size > 0f ? layout.light_fx.clover.sprite_size : 0.25f,
+                    layout.light_fx.clover.sprite_size > 0f ? layout.light_fx.clover.sprite_size : 0.25f, 12);
+                dot.gameObject.name = "Clover Soft Dot";
+                dot.sharedMaterial = softDotMaterial;
+                dot.color = Color.white;
+                var properties = new MaterialPropertyBlock();
+                dot.GetPropertyBlock(properties);
+                properties.SetColor(Shader.PropertyToID("_BaseColor"), ParseHtmlColor(layout.light_fx.clover.color));
+                dot.SetPropertyBlock(properties);
+            }
+            if (count != 9)
+                Debug.LogWarning($"Forest layout contains {count} clover light positions; the current lighting spec expects 9.");
+        }
+
+        private static Light2D ConfigurePointLight(GameObject lightObject, Chapter1LightData settings, bool enabled)
+        {
+            Light2D light = lightObject.AddComponent<Light2D>();
+            light.lightType = Light2D.LightType.Point;
+            light.color = ParseHtmlColor(settings.color);
+            light.intensity = settings.intensity;
+            light.pointLightInnerRadius = settings.inner_radius;
+            light.pointLightOuterRadius = settings.radius;
+            light.falloffIntensity = settings.falloff_intensity;
+            light.shadowsEnabled = false;
+            light.enabled = enabled;
+            return light;
+        }
+
+        private static Color ParseHtmlColor(string htmlColor)
+        {
+            if (ColorUtility.TryParseHtmlString(htmlColor, out Color color)) return color;
+            throw new InvalidDataException($"Invalid light/layer color '{htmlColor}'.");
         }
 
         private static ParticleSystem CreateSmoke(Transform parent, Vector3 localPosition, Vector2 area)
@@ -935,7 +1118,7 @@ namespace TheFairyHills.Editor
             main.startLifetime = new ParticleSystem.MinMaxCurve(1.5f, 2.5f);
             main.startSpeed = 0f;
             main.startSize = new ParticleSystem.MinMaxCurve(1f, 2.5f);
-            main.startColor = new ParticleSystem.MinMaxGradient(new Color32(26, 14, 34, 220));
+            main.startColor = new ParticleSystem.MinMaxGradient(new Color32(59, 45, 77, 220));
             main.maxParticles = 180;
             ParticleSystem.EmissionModule emission = particles.emission;
             emission.rateOverTime = 40f;
@@ -945,14 +1128,17 @@ namespace TheFairyHills.Editor
             shape.scale = new Vector3(area.x, area.y, 0.1f);
             ParticleSystem.VelocityOverLifetimeModule velocity = particles.velocityOverLifetime;
             velocity.enabled = true;
+            velocity.space = ParticleSystemSimulationSpace.Local;
+            velocity.x = new ParticleSystem.MinMaxCurve(0f, 0f);
             velocity.y = new ParticleSystem.MinMaxCurve(1.5f, 3f);
+            velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
             ParticleSystem.NoiseModule noise = particles.noise;
             noise.enabled = true;
             noise.strength = new ParticleSystem.MinMaxCurve(0.5f, 1f);
             noise.frequency = 0.5f;
             ParticleSystem.ColorOverLifetimeModule color = particles.colorOverLifetime;
             color.enabled = true;
-            color.color = new ParticleSystem.MinMaxGradient(CreateAlphaFadeGradient(new Color32(26, 14, 34, 230)));
+            color.color = new ParticleSystem.MinMaxGradient(CreateAlphaFadeGradient(new Color32(59, 45, 77, 220)));
             ParticleSystem.SizeOverLifetimeModule size = particles.sizeOverLifetime;
             size.enabled = true;
             size.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(1f, 1.5f)));
@@ -970,13 +1156,16 @@ namespace TheFairyHills.Editor
             emberMain.startLifetime = new ParticleSystem.MinMaxCurve(0.35f, 0.8f);
             emberMain.startSpeed = new ParticleSystem.MinMaxCurve(0.4f, 1.1f);
             emberMain.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.2f);
-            emberMain.startColor = new ParticleSystem.MinMaxGradient(new Color32(150, 24, 34, 240));
+            emberMain.startColor = new ParticleSystem.MinMaxGradient(new Color32(224, 48, 58, 255));
             emberMain.maxParticles = 40;
             ParticleSystem.EmissionModule emberEmission = embers.emission;
             emberEmission.enabled = false;
             ParticleSystem.VelocityOverLifetimeModule emberVelocity = embers.velocityOverLifetime;
             emberVelocity.enabled = true;
+            emberVelocity.space = ParticleSystemSimulationSpace.Local;
+            emberVelocity.x = new ParticleSystem.MinMaxCurve(0f, 0f);
             emberVelocity.y = new ParticleSystem.MinMaxCurve(0.5f, 1.5f);
+            emberVelocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
             ParticleSystemRenderer emberRenderer = embers.GetComponent<ParticleSystemRenderer>();
             emberRenderer.renderMode = ParticleSystemRenderMode.Billboard;
             emberRenderer.sortingOrder = 15;
@@ -1012,6 +1201,43 @@ namespace TheFairyHills.Editor
             material.SetFloat("_Surface", 1f);
             material.SetFloat("_Blend", 2f);
             material.SetColor("_BaseColor", new Color(176f / 255f, 32f / 255f, 42f / 255f, 0.5f));
+            EditorUtility.SetDirty(material);
+            return material;
+        }
+
+        private static Material GetSoftDotAdditiveMaterial(Texture texture)
+        {
+            const string path = "Assets/_Project/Art/FX/M_FX_SoftDotAdditive.mat";
+            Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (shader == null) throw new InvalidOperationException("URP Particles/Unlit shader is unavailable.");
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material == null)
+            {
+                material = new Material(shader) { name = "M_FX_SoftDotAdditive" };
+                AssetDatabase.CreateAsset(material, path);
+            }
+            else material.shader = shader;
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_Blend", 2f);
+            material.SetColor("_BaseColor", Color.white);
+            EditorUtility.SetDirty(material);
+            return material;
+        }
+
+        private static Material GetSpriteUnlitMaterial()
+        {
+            const string path = "Assets/_Project/Art/FX/M_FX_SpriteUnlit.mat";
+            Shader shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+            if (shader == null) throw new InvalidOperationException("URP 2D Sprite-Unlit-Default shader is unavailable.");
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material == null)
+            {
+                material = new Material(shader) { name = "M_FX_SpriteUnlit" };
+                AssetDatabase.CreateAsset(material, path);
+            }
+            else material.shader = shader;
+            material.SetColor("_Color", Color.white);
             EditorUtility.SetDirty(material);
             return material;
         }

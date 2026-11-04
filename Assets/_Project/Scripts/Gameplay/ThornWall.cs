@@ -14,6 +14,9 @@ namespace TheFairyHills.Gameplay
         [SerializeField] private ParticleSystem smoke;
         [SerializeField] private SpriteRenderer glowRenderer;
         [SerializeField] private Light2D redLight;
+        [SerializeField] private float redLightIntensityMultiplier = 1.2f;
+        [SerializeField] private Light2D exitLight;
+        [SerializeField] private float exitLightTargetIntensity = 0.7f;
         private MaterialPropertyBlock glowProperties;
         private float currentGlowAlpha = 0.5f;
         private float nextFlashTime;
@@ -21,13 +24,14 @@ namespace TheFairyHills.Gameplay
         public bool IsDispersed { get; private set; }
 
         public void Configure(SpriteRenderer renderer, Collider2D collider, ParticleSystem smokeEffect,
-            SpriteRenderer glowEffect, Light2D pointLight)
+            SpriteRenderer glowEffect, Light2D pointLight, float lightIntensityMultiplier = 1.2f)
         {
             wallRenderer = renderer;
             blockingCollider = collider;
             smoke = smokeEffect;
             glowRenderer = glowEffect;
             redLight = pointLight;
+            redLightIntensityMultiplier = lightIntensityMultiplier;
             if (glowRenderer != null)
             {
                 glowRenderer.color = Color.white;
@@ -37,6 +41,17 @@ namespace TheFairyHills.Gameplay
             }
             nextFlashTime = Time.time + Random.Range(3f, 6f);
             flashEndTime = 0f;
+        }
+
+        public void ConfigureExitLight(Light2D light, float targetIntensity)
+        {
+            exitLight = light;
+            exitLightTargetIntensity = targetIntensity;
+            if (exitLight != null)
+            {
+                exitLight.enabled = false;
+                exitLight.intensity = targetIntensity;
+            }
         }
 
         private void Update()
@@ -102,12 +117,28 @@ namespace TheFairyHills.Gameplay
                 wallRenderer.color = color;
             }
             if (blockingCollider != null) blockingCollider.enabled = false;
+            if (exitLight != null) StartCoroutine(FadeInExitLight());
         }
 
         private void SetGlow(float alpha)
         {
             SetGlowColor(alpha);
-            if (redLight != null) redLight.intensity = 0.45f * alpha;
+            if (redLight != null) redLight.intensity = redLightIntensityMultiplier * alpha;
+        }
+
+        private IEnumerator FadeInExitLight()
+        {
+            const float duration = 1f;
+            exitLight.enabled = true;
+            exitLight.intensity = 0f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                exitLight.intensity = exitLightTargetIntensity * Mathf.Clamp01(elapsed / duration);
+                yield return null;
+            }
+            exitLight.intensity = exitLightTargetIntensity;
         }
 
         private void SetGlowColor(float alpha)

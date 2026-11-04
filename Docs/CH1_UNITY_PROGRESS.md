@@ -148,3 +148,13 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 - Recorded the user's saved Scene-view placement for `Gate_PostR_Front` at local position `(0.99, 0, 0)` under `Village Gate` (world X `27.4`). The Inspector screenshot showed X `0.988`; Unity reports the serialized Transform as `0.99`.
 - Updated `Chapter1SceneBuilder.CreateVillageGate` to use the same position so a Village rebuild will retain the alignment. Kept sorting order 11 and left the gate backing, collider, interaction range, and behavior unchanged.
 - The Village scene was already saved at this position and was left untouched in this follow-up. No Play Mode/gameplay test was run.
+
+## Revision v3 Fix B2/B3 — 2026-11-05
+
+- B3: Smoke and ember velocity axes are all Two Constants in Local space. Smoke uses `#3B2D4D` fading from alpha 220 to 0; embers use `#E0303A`. The first focused build showed Unity's JSON utility did not read the nested clover coordinate array; the builder now parses those coordinate pairs explicitly, and the rebuilt Forest contains all nine clover lights.
+- B2: `LevelInfo` now carries per-level ambient color/intensity and player-light enablement. `LevelInfo.Awake` applies them as an additive level activates, before its first rendered frame; `ChapterSceneLoader` also applies them when attaching a level and when Core loads over a level opened directly in the Editor. Forest is `#6878A0` at 0.28 with the player light on; Village defaults remain white at 1.0 with the player light off.
+- Added the Core-root Global Light and Niamh's warm Point Light (position `(0, 1.2)`, intensity 1.2, radii 0.8/5.5, falloff 0.7, no shadows, 1-second fade and ±4%/3-second breathing). Forest layers use the layout's unlit/tint data; L0/L1/L4 are unlit and L2/L3/L3b remain lit.
+- Added nine layout-driven clover lights and additive dots, the cross light that turns on with the post-gap stars and fades after pickup, a 7u thorn light at `1.2 × glow alpha`, and a 1-second exit-light fade after the wall disperses.
+- Rebuilt and saved only `Core_Persistent` and `Ch1_S1b_ForestPath`; the Village scene stayed unchanged. Scene inspection found exactly one Global Light at the Core scene root, none under Niamh or in Forest, all nine clover lights, and Two Constants/Local velocity on both particle systems. Unity compilation and scene generation succeeded. No automated tests or Play Mode run were performed per task instructions.
+- Please manually check both entering Forest from Village and pressing Play directly in Forest, including the first frame, layer darkness, Niamh's light, clovers, cross, wall smoke/embers, exit light, and unchanged Village lighting.
+

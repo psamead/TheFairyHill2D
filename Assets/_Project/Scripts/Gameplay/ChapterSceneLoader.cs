@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.Universal;
 
 namespace TheFairyHills.Gameplay
 {
@@ -11,14 +12,47 @@ namespace TheFairyHills.Gameplay
         [SerializeField] private PlayerController2D player;
         [SerializeField] private ChapterCameraFollow cameraFollow;
         [SerializeField] private ChapterHUD hud;
+        [SerializeField] private Light2D globalLight;
+        [SerializeField] private Light2D playerLight;
         private Scene currentLevel;
         private bool loading;
+        private float playerLightFadeStart;
+        private bool fadingPlayerLight;
+        private const float PlayerLightIntensity = 1.2f;
 
-        public void Configure(PlayerController2D corePlayer, ChapterCameraFollow follow, ChapterHUD coreHud)
+        public void Configure(PlayerController2D corePlayer, ChapterCameraFollow follow, ChapterHUD coreHud,
+            Light2D coreGlobalLight, Light2D corePlayerLight)
         {
             player = corePlayer;
             cameraFollow = follow;
             hud = coreHud;
+            globalLight = coreGlobalLight;
+            playerLight = corePlayerLight;
+        }
+
+        private void Start()
+        {
+            // When a level is opened directly in the Editor, the Core scene loads additively.
+            // Apply that active level's lighting as soon as this persistent loader starts.
+            Scene active = SceneManager.GetActiveScene();
+            if (active.IsValid() && active != gameObject.scene && FindInScene<LevelInfo>(active) != null)
+            {
+                currentLevel = active;
+                ApplyLevel(active, "Spawn_Start");
+            }
+        }
+
+        private void Update()
+        {
+            if (playerLight == null || !playerLight.enabled) return;
+            float fade = 1f;
+            if (fadingPlayerLight)
+            {
+                fade = Mathf.Clamp01((Time.unscaledTime - playerLightFadeStart) / 1f);
+                if (fade >= 1f) fadingPlayerLight = false;
+            }
+            float breathe = 1f + 0.04f * Mathf.Sin(Time.unscaledTime * (Mathf.PI * 2f / 3f));
+            playerLight.intensity = PlayerLightIntensity * fade * breathe;
         }
 
         public void LoadLevel(string sceneName, string spawnId = "Spawn_Start")
@@ -60,7 +94,7 @@ namespace TheFairyHills.Gameplay
 
         public void AttachCurrentLevel(Scene level)
         {
-            if (level.IsValid() && level.name != "Core_Persistent")
+            if (level.IsValid() && level.name != "Core_Persistent" && level != currentLevel)
                 StartCoroutine(AttachRoutine(level, "Spawn_Start"));
         }
 
@@ -96,6 +130,7 @@ namespace TheFairyHills.Gameplay
         private void ApplyLevel(Scene level, string spawnId)
         {
             LevelInfo info = FindInScene<LevelInfo>(level);
+            ApplyLevelLighting(info);
             SpawnPoint[] spawns = FindAllInScene<SpawnPoint>(level);
             SpawnPoint spawn = null;
             foreach (SpawnPoint candidate in spawns)
@@ -113,6 +148,25 @@ namespace TheFairyHills.Gameplay
             }
             if (cameraFollow != null && player != null)
                 cameraFollow.Configure(player.transform, Camera.main, info != null ? info.LevelLength : 38.4f);
+        }
+
+        public void ApplyLevelLighting(LevelInfo info)
+        {
+            if (globalLight != null)
+            {
+                globalLight.color = info != null ? info.AmbientColor : Color.white;
+                globalLight.intensity = info != null ? info.AmbientIntensity : 1f;
+                globalLight.enabled = true;
+            }
+
+            if (playerLight != null)
+            {
+                bool enabledForLevel = info != null && info.PlayerLight;
+                playerLight.enabled = enabledForLevel;
+                fadingPlayerLight = enabledForLevel;
+                playerLightFadeStart = Time.unscaledTime;
+                playerLight.intensity = enabledForLevel ? 0f : PlayerLightIntensity;
+            }
         }
 
         private static T FindInScene<T>(Scene scene) where T : Component
