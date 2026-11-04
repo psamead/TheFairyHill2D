@@ -181,6 +181,27 @@ namespace TheFairyHills.Editor
             Debug.Log("Built Revision v3 Batch B: Forest visuals only. Core, Village, MainMenu, and Build Settings were left unchanged.");
         }
 
+        [MenuItem("Tools/The Fairy Hills/Build Revision v3 Fix A1 B1")]
+        public static void BuildRevisionV3FixA1B1()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode before building Revision v3 Fix A1/B1.");
+
+            Scene activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.IsValid() && activeScene.isDirty)
+                throw new InvalidOperationException($"Save the dirty scene '{activeScene.path}' before building Revision v3 Fix A1/B1.");
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ConfigureSpriteImport("Assets/_Project/Art/Backgrounds/S1_Village/props/S1_prop_gate_postR_front.png", false, false);
+            ConfigureThornGlowMaterial();
+            Chapter1LayoutData village = LoadLayout(VillageLayoutPath);
+            Chapter1LayoutData forest = LoadLayout(ForestLayoutPath);
+            BuildScene(village, VillageScenePath, false);
+            BuildScene(forest, ForestScenePath, true);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Built Revision v3 Fix A1/B1: Village and Forest only. Core, MainMenu, and Build Settings were left unchanged.");
+        }
+
         private static void ConfigureBatchBForestAssets()
         {
             const string forestFolder = "Assets/_Project/Art/Backgrounds/S1b_ForestPath/";
@@ -239,6 +260,16 @@ namespace TheFairyHills.Editor
             material.SetFloat("_Surface", 1f);
             material.SetFloat("_Blend", 2f);
             material.SetColor("_BaseColor", Color.white);
+            EditorUtility.SetDirty(material);
+        }
+
+        private static void ConfigureThornGlowMaterial()
+        {
+            Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (shader == null) throw new InvalidOperationException("URP Particles/Unlit shader is unavailable.");
+            Texture texture = LoadSprite("Assets/_Project/Art/Backgrounds/S1b_ForestPath/props/F_prop_thornwall_v3_glow.png").texture;
+            Material material = GetThornGlowMaterial(texture);
+            material.SetColor("_BaseColor", new Color(176f / 255f, 32f / 255f, 42f / 255f, 0.5f));
             EditorUtility.SetDirty(material);
         }
 
@@ -769,7 +800,15 @@ namespace TheFairyHills.Editor
             Sprite openSprite = LoadSprite(folder + interaction.sprite_open);
             SpriteRenderer gateRenderer = CreateScaledSprite(root.transform, closedSprite,
                 interaction.image_w, interaction.image_h, Mathf.RoundToInt(interaction.sorting_order));
+            gateRenderer.gameObject.name = "Gate_Back";
             gateRenderer.transform.localPosition = new Vector3(interaction.image_x - interaction.x, 0f, 0f);
+
+            Sprite frontPostSprite = GetGateRightPostSprite(folder + "props/S1_prop_gate_postR_front.png");
+            SpriteRenderer frontPostRenderer = CreateScaledSprite(root.transform, frontPostSprite,
+                frontPostSprite.bounds.size.x, frontPostSprite.bounds.size.y, 11);
+            frontPostRenderer.gameObject.name = "Gate_PostR_Front";
+            // Match the user's placed right-post position so a scene rebuild preserves the alignment.
+            frontPostRenderer.transform.localPosition = new Vector3(0.99f, 0f, 0f);
 
             BoxCollider2D blocker = root.AddComponent<BoxCollider2D>();
             blocker.size = new Vector2(interaction.blocker_x1 - interaction.blocker_x0, interaction.blocker_h);
@@ -972,9 +1011,27 @@ namespace TheFairyHills.Editor
             material.SetTexture("_BaseMap", texture);
             material.SetFloat("_Surface", 1f);
             material.SetFloat("_Blend", 2f);
-            material.SetColor("_BaseColor", Color.white);
+            material.SetColor("_BaseColor", new Color(176f / 255f, 32f / 255f, 42f / 255f, 0.5f));
             EditorUtility.SetDirty(material);
             return material;
+        }
+
+        private static Sprite GetGateRightPostSprite(string sourcePath)
+        {
+            const string slicedSpritePath = "Assets/_Project/Art/Backgrounds/S1_Village/props/S1_prop_gate_postR_front_right.asset";
+            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(slicedSpritePath);
+            if (sprite != null) return sprite;
+
+            Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(sourcePath);
+            if (texture == null || texture.width != 414 || texture.height != 240)
+                throw new InvalidOperationException("Gate front-post source must be the supplied 414x240 PNG.");
+
+            // The supplied PNG currently contains both posts. Keep the source intact and use its right-hand post only.
+            sprite = Sprite.Create(texture, new Rect(300f, 0f, 114f, 240f), Vector2.zero, 100f,
+                0, SpriteMeshType.Tight);
+            sprite.name = "S1_prop_gate_postR_front_right";
+            AssetDatabase.CreateAsset(sprite, slicedSpritePath);
+            return sprite;
         }
 
         private static SpriteRenderer CreateScaledSprite(Transform parent, Sprite sprite, float width, float height, int order)

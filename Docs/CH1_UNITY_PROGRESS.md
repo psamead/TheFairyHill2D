@@ -135,3 +135,16 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 ## Village Gate Layer Reverted — 2026-11-01
 
 - Reverted the gate visual to sorting order -5 after the foreground placement caused a visual/design issue. Scene and layout JSON now agree; collider and interaction settings remain unchanged.
+
+## Revision v3 Fix A1/B1 — 2026-11-01
+
+- A1: Added the supplied gate front-post art without overwriting the source PNG. The supplied 414×240 PNG contains both posts despite the spec describing only the right post, so the builder now derives a right-post-only Sprite asset from the right-hand 114 px of that image. It overlays the gate back at sorting order 11; the closed/open gate renderer remains at -5. Niamh is order 10, so 11 is used instead of the spec's order 5 to actually render in front. Gate collider, range, and open/close logic are unchanged.
+- B1: ThornWall now applies `#B0202A` tint and pulse alpha through a `MaterialPropertyBlock` `_BaseColor`; the SpriteRenderer stays white. The additive material defaults to `#B0202A` at 0.5 alpha. Existing red point-light fading and Q → smoke → wall removal behavior are unchanged.
+- Updated the builder with a focused A1/B1 rebuild command and saved targeted changes to the Village and Forest scenes. Niamh capsule and Village wall/hay-bale collider overrides were preserved. B2 lighting was not changed.
+- Unity Editor source compilation and scene save completed. No automated tests were run, per task instructions. Play Mode appearance and interaction need the user's manual check.
+
+## Village Gate Right Post Alignment — 2026-11-01
+
+- Recorded the user's saved Scene-view placement for `Gate_PostR_Front` at local position `(0.99, 0, 0)` under `Village Gate` (world X `27.4`). The Inspector screenshot showed X `0.988`; Unity reports the serialized Transform as `0.99`.
+- Updated `Chapter1SceneBuilder.CreateVillageGate` to use the same position so a Village rebuild will retain the alignment. Kept sorting order 11 and left the gate backing, collider, interaction range, and behavior unchanged.
+- The Village scene was already saved at this position and was left untouched in this follow-up. No Play Mode/gameplay test was run.
