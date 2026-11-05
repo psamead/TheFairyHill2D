@@ -81,14 +81,14 @@
         {
           "sprite": "props/S1_prop_gate_rubble_L.png",
           "x": 24.49,
-          "y": -0.12,
-          "sorting_order": -4
+          "y": 0.183,
+          "sorting_order": -6
         },
         {
           "sprite": "props/S1_prop_gate_rubble_R.png",
-          "x": 27.65,
+          "x": 27.934,
           "y": -0.15,
-          "sorting_order": 6
+          "sorting_order": 12
         }
       ]
     },

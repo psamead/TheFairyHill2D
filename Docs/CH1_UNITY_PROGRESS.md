@@ -203,3 +203,13 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 - G4: Level music no longer starts on Awake. `LevelBootstrap` waits for Core when Forest is opened directly, verifies/enables Core's single AudioListener, and then starts the level music. Core's serialized listener was already enabled, so Core was not rebuilt.
 - Rebuilt and saved Forest only; MainMenu, Village, Core, HUD, and Build Settings were not rebuilt or changed for this round. Unity compilation, shader support, serialized scene settings, and scene structure were inspected. No automated tests or Play Mode/audio playback checks were run. Edit-mode listener warnings with Forest open alone are expected.
 - Please check: no pre-Q gold burn edge; 1.2u halo and light aligned to the main star; the cross fades in within 2.5u regardless of shamrock state and is visible in front of the bramble; direct Forest Play has no missing-listener warning.
+
+## Village right gate rubble alignment sync — 2026-11-05
+
+- Synced `S1_prop_gate_rubble_R` from the live Unity Inspector: local position `(1.524, -0.15, 0)` under `Village Gate`, world position `(27.934, -0.15, 0)`, and Sprite Renderer Order in Layer `12`.
+- Updated the matching `rubble` entry in `S1_Village_layout_v3.json`. `Chapter1SceneBuilder` already derives the rubble child position and sorting order from this layout, so no builder logic change or scene rebuild was needed. Preserved the existing Unity scene and font asset worktree changes.
+
+## Village left gate rubble alignment sync — 2026-11-05
+
+- Synced `S1_prop_gate_rubble_L` from the live Unity Inspector: local position `(-1.92, 0.183, 0)` under `Village Gate`, world position `(24.49, 0.183, 0)`, and Sprite Renderer Order in Layer `-6`.
+- Updated the matching `rubble` entry in `S1_Village_layout_v3.json`. The builder already derives the child position and sorting order from the layout. The active Village scene is dirty, so I left it open and did not rebuild or save it. Existing scene and font asset changes remain untouched.
