@@ -76,7 +76,21 @@
       "blocker_x1": 28.1,
       "blocker_h": 8.0,
       "range_x0": 22.0,
-      "range_x1": 31.0
+      "range_x1": 31.0,
+      "rubble": [
+        {
+          "sprite": "props/S1_prop_gate_rubble_L.png",
+          "x": 24.49,
+          "y": -0.12,
+          "sorting_order": -4
+        },
+        {
+          "sprite": "props/S1_prop_gate_rubble_R.png",
+          "x": 27.65,
+          "y": -0.15,
+          "sorting_order": 6
+        }
+      ]
     },
     {
       "x": 37.8,

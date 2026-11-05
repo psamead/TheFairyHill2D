@@ -83,6 +83,16 @@ namespace TheFairyHills.Editor
         public float range_x0;
         public float range_x1;
         public float hint_trigger_x;
+        public Chapter1RubbleData[] rubble;
+    }
+
+    [Serializable]
+    internal sealed class Chapter1RubbleData
+    {
+        public string sprite;
+        public float x;
+        public float y;
+        public int sorting_order;
     }
 
     [Serializable]
@@ -249,6 +259,29 @@ namespace TheFairyHills.Editor
             BuildScene(forest, ForestScenePath, true);
             AssetDatabase.SaveAssets();
             Debug.Log("Built Revision v3 Fix B2/B3: Core_Persistent and Forest only. Village, MainMenu, and Build Settings were left unchanged.");
+        }
+
+        [MenuItem("Tools/The Fairy Hills/Build Revision v3 Fix C")]
+        private static void BuildRevisionV3FixC()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode before building Revision v3 Fix C.");
+
+            Scene activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.IsValid() && activeScene.isDirty)
+                throw new InvalidOperationException($"Save the dirty scene '{activeScene.path}' before building Revision v3 Fix C.");
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ConfigureSpriteImport("Assets/_Project/Art/Backgrounds/S1_Village/props/S1_prop_gate_rubble_L.png", false, false, true);
+            ConfigureSpriteImport("Assets/_Project/Art/Backgrounds/S1_Village/props/S1_prop_gate_rubble_R.png", false, false, true);
+            ConfigureForestParticleMaterial();
+            ConfigureEmberMaterial();
+            Chapter1LayoutData village = LoadLayout(VillageLayoutPath);
+            Chapter1LayoutData forest = LoadLayout(ForestLayoutPath);
+            BuildScene(village, VillageScenePath, false);
+            BuildScene(forest, ForestScenePath, true);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Built Revision v3 Fix C: Village and Forest only. Core, MainMenu, HUD, audio, and Build Settings were left unchanged.");
         }
 
         private static void ConfigureBatchBForestAssets()
@@ -529,11 +562,16 @@ namespace TheFairyHills.Editor
 
         private static void ConfigureSpriteImport(string path, bool groundLinePivot, bool compressed)
         {
+            ConfigureSpriteImport(path, groundLinePivot, compressed, false);
+        }
+
+        private static void ConfigureSpriteImport(string path, bool groundLinePivot, bool compressed, bool bottomCenterPivot)
+        {
             TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
             if (importer == null) throw new InvalidOperationException($"Texture importer not available for {path}.");
 
             importer.GetSourceTextureWidthAndHeight(out int width, out int height);
-            Vector2 pivot = groundLinePivot ? new Vector2(0f, 270f / height) :
+            Vector2 pivot = bottomCenterPivot ? new Vector2(0.5f, 0f) : groundLinePivot ? new Vector2(0f, 270f / height) :
                 path == NiamhSpritePath ? new Vector2(0.5f, 0f) : Vector2.zero;
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
@@ -869,9 +907,21 @@ namespace TheFairyHills.Editor
                 barrier.size = new Vector2(barrierWidth, block.h);
                 barrier.offset = new Vector2(barrierLocalX + barrierWidth * 0.5f, block.h * 0.5f);
                 Vector3 effectCenter = new Vector3(barrierLocalX + barrierWidth * 0.5f, block.h * 0.5f, -0.1f);
-                ParticleSystem smoke = CreateSmoke(root.transform, effectCenter, new Vector2(barrierWidth, block.h));
+                ParticleSystem smoke = CreateSmoke(root.transform, effectCenter, new Vector2(barrierWidth, block.h),
+                    out ParticleSystem sparks, out ParticleSystem glowSmoke);
                 SpriteRenderer glow = null;
                 Light2D redLight = null;
+                GameObject flashLightObject = new GameObject("IronPulse Orange Flash Point Light");
+                flashLightObject.transform.SetParent(root.transform, false);
+                flashLightObject.transform.localPosition = effectCenter;
+                Light2D flashLight = flashLightObject.AddComponent<Light2D>();
+                flashLight.lightType = Light2D.LightType.Point;
+                flashLight.color = new Color32(255, 106, 42, 255);
+                flashLight.pointLightOuterRadius = 10f;
+                flashLight.falloffIntensity = 0.7f;
+                flashLight.shadowsEnabled = false;
+                flashLight.intensity = 0f;
+                flashLight.enabled = false;
                 if (!string.IsNullOrEmpty(block.glow))
                 {
                     Sprite glowSprite = LoadSprite(folder + block.glow);
@@ -891,6 +941,7 @@ namespace TheFairyHills.Editor
                     redLight.shadowsEnabled = false;
                 }
                 root.AddComponent<ThornWall>().Configure(renderer, barrier, smoke, glow, redLight,
+                    flashLight, sparks, glowSmoke,
                     lightFx != null && lightFx.thornwall != null ? lightFx.thornwall.intensity : 1.2f);
             }
         }
@@ -939,6 +990,16 @@ namespace TheFairyHills.Editor
             trigger.isTrigger = true;
             trigger.size = new Vector2(interaction.range_x1 - interaction.range_x0, interaction.blocker_h);
             range.AddComponent<GateRangeTrigger>().Configure(gate);
+
+            foreach (Chapter1RubbleData rubble in interaction.rubble ?? Array.Empty<Chapter1RubbleData>())
+            {
+                Sprite rubbleSprite = LoadSprite(folder + rubble.sprite);
+                SpriteRenderer rubbleRenderer = CreateScaledSprite(root.transform, rubbleSprite,
+                    rubbleSprite.bounds.size.x, rubbleSprite.bounds.size.y, rubble.sorting_order);
+                rubbleRenderer.gameObject.name = Path.GetFileNameWithoutExtension(rubble.sprite);
+                rubbleRenderer.transform.localPosition = new Vector3(rubble.x - interaction.x,
+                    rubble.y - interaction.y, 0f);
+            }
         }
 
         private static void CreateIronCross(Chapter1InteractData interaction, Chapter1ForestLightFxData lightFx)
@@ -953,9 +1014,13 @@ namespace TheFairyHills.Editor
             trigger.isTrigger = true;
             trigger.size = new Vector2(1.3f, 1.2f);
             trigger.offset = new Vector2(0f, 0.6f);
-            ParticleSystem stars = CreateSparkleHint(pickup.transform);
-            SpriteRenderer mainStar = CreateMainStar(pickup.transform, interaction.sorting_order == 0f ? 11 :
-                Mathf.RoundToInt(interaction.sorting_order));
+            int crossOrder = interaction.sorting_order == 0f ? 11 : Mathf.RoundToInt(interaction.sorting_order);
+            ParticleSystem stars = CreateSparkleHint(pickup.transform, "Iron Cross Hint Stars", 2.2f,
+                false, crossOrder);
+            ParticleSystem spinningStars = CreateSparkleHint(pickup.transform, "Iron Cross Slow Spin Stars", 1.1f,
+                true, crossOrder);
+            SpriteRenderer mainStar = CreateMainStar(pickup.transform, crossOrder);
+            SpriteRenderer starHalo = CreateStarHalo(pickup.transform, crossOrder);
             Chapter1LightData lightSettings = lightFx != null ? lightFx.cross : null;
             Light2D crossLight = null;
             if (lightSettings != null)
@@ -965,41 +1030,54 @@ namespace TheFairyHills.Editor
                 lightObject.transform.position = cross.bounds.center;
                 crossLight = ConfigurePointLight(lightObject, lightSettings, false);
             }
-            pickup.AddComponent<IronCrossPickup>().Configure(cross, stars, mainStar, crossLight,
-                lightSettings != null ? lightSettings.intensity : 0.8f, 2.5f, interaction.hint_trigger_x);
+            pickup.AddComponent<IronCrossPickup>().Configure(cross, stars, spinningStars, mainStar, starHalo,
+                crossLight, lightSettings != null ? lightSettings.intensity : 0.8f, 2.5f, interaction.hint_trigger_x);
         }
 
-        private static ParticleSystem CreateSparkleHint(Transform parent)
+        private static ParticleSystem CreateSparkleHint(Transform parent, string objectName, float rate,
+            bool spinsSlowly, int sortingOrder)
         {
-            GameObject starsObject = new GameObject("Iron Cross Hint Stars");
+            GameObject starsObject = new GameObject(objectName);
             starsObject.transform.SetParent(parent, false);
             starsObject.transform.localPosition = new Vector3(0f, 0.25f, -0.15f);
             ParticleSystem stars = starsObject.AddComponent<ParticleSystem>();
             ParticleSystem.MainModule main = stars.main;
             main.loop = true;
             main.playOnAwake = false;
-            main.startLifetime = 0.5f;
-            main.startSpeed = new ParticleSystem.MinMaxCurve(0.02f, 0.12f);
-            main.startSize = new ParticleSystem.MinMaxCurve(0.4f, 0.7f);
-            main.startColor = new Color(1f, 0.86f, 0.52f, 0.95f);
-            main.maxParticles = 36;
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            main.startLifetime = 1.2f;
+            main.startSpeed = 0f;
+            main.startSize = new ParticleSystem.MinMaxCurve(0.8f, 1.4f);
+            main.startColor = Color.white;
+            main.maxParticles = 6;
             ParticleSystem.EmissionModule emission = stars.emission;
-            emission.rateOverTime = new ParticleSystem.MinMaxCurve(4f, 6f);
+            emission.rateOverTime = rate;
             ParticleSystem.ShapeModule shape = stars.shape;
             shape.shapeType = ParticleSystemShapeType.Circle;
-            shape.radius = 1.2f;
-            shape.radiusThickness = 0f;
+            shape.radius = 1.5f;
+            shape.radiusThickness = 1f;
             ParticleSystem.ColorOverLifetimeModule color = stars.colorOverLifetime;
             color.enabled = true;
-            color.color = new ParticleSystem.MinMaxGradient(CreateAlphaFadeGradient(new Color32(255, 220, 150, 255)));
+            color.color = new ParticleSystem.MinMaxGradient(CreateCrossStarGradient());
             ParticleSystem.SizeOverLifetimeModule size = stars.sizeOverLifetime;
             size.enabled = true;
             size.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(
-                new Keyframe(0f, 0.65f), new Keyframe(1f, 1.5f)));
+                new Keyframe(0f, 0f), new Keyframe(0.18f, 1f), new Keyframe(0.36f, 0.9f),
+                new Keyframe(0.56f, 1.05f), new Keyframe(0.76f, 0.9f), new Keyframe(1f, 0f)));
+            if (spinsSlowly)
+            {
+                ParticleSystem.RotationOverLifetimeModule rotation = stars.rotationOverLifetime;
+                rotation.enabled = true;
+                rotation.z = 3.927f;
+            }
             ParticleSystemRenderer renderer = stars.GetComponent<ParticleSystemRenderer>();
             renderer.renderMode = ParticleSystemRenderMode.Billboard;
-            renderer.sortingOrder = 13;
+            renderer.sortingOrder = sortingOrder;
             renderer.sharedMaterial = GetSparkleMaterial();
+            var properties = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(properties);
+            properties.SetColor(Shader.PropertyToID("_BaseColor"), Color.white);
+            renderer.SetPropertyBlock(properties);
             return stars;
         }
 
@@ -1010,13 +1088,48 @@ namespace TheFairyHills.Editor
             starObject.transform.localPosition = new Vector3(0f, 0.55f, -0.15f);
             SpriteRenderer renderer = starObject.AddComponent<SpriteRenderer>();
             renderer.sprite = LoadSprite("Assets/_Project/Art/FX/FX_sparkle_star.png");
-            renderer.sortingOrder = crossOrder + 2;
+            renderer.sortingOrder = crossOrder;
             renderer.sharedMaterial = GetSparkleMaterial();
-            renderer.color = new Color32(255, 224, 157, 255);
+            renderer.color = Color.white;
+            var properties = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(properties);
+            properties.SetColor(Shader.PropertyToID("_BaseColor"), new Color32(255, 224, 157, 255));
+            renderer.SetPropertyBlock(properties);
             Vector2 size = renderer.sprite.bounds.size;
-            starObject.transform.localScale = new Vector3(0.8f / size.x, 0.8f / size.y, 1f);
+            starObject.transform.localScale = new Vector3(1.6f / size.x, 1.6f / size.y, 1f);
             starObject.SetActive(false);
             return renderer;
+        }
+
+        private static SpriteRenderer CreateStarHalo(Transform parent, int sortingOrder)
+        {
+            GameObject haloObject = new GameObject("Iron Cross Star Halo");
+            haloObject.transform.SetParent(parent, false);
+            haloObject.transform.localPosition = new Vector3(0f, 0.55f, -0.16f);
+            SpriteRenderer renderer = haloObject.AddComponent<SpriteRenderer>();
+            renderer.sprite = LoadSprite("Assets/_Project/Art/FX/FX_soft_dot.png");
+            renderer.sortingOrder = sortingOrder;
+            renderer.sharedMaterial = GetSoftDotAdditiveMaterial(renderer.sprite.texture);
+            renderer.color = Color.white;
+            var properties = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(properties);
+            properties.SetColor(Shader.PropertyToID("_BaseColor"), new Color(242f / 255f, 210f / 255f, 138f / 255f, 0.35f));
+            renderer.SetPropertyBlock(properties);
+            Vector2 size = renderer.sprite.bounds.size;
+            haloObject.transform.localScale = new Vector3(2.5f / size.x, 2.5f / size.y, 1f);
+            haloObject.SetActive(false);
+            return renderer;
+        }
+
+        private static Gradient CreateCrossStarGradient()
+        {
+            var gradient = new Gradient();
+            Color warmGold = new Color32(255, 230, 170, 255);
+            gradient.SetKeys(
+                new[] { new GradientColorKey(warmGold, 0f), new GradientColorKey(warmGold, 1f) },
+                new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.16f),
+                    new GradientAlphaKey(0.9f, 0.78f), new GradientAlphaKey(0f, 1f) });
+            return gradient;
         }
 
         private static Material GetSparkleMaterial()
@@ -1058,9 +1171,6 @@ namespace TheFairyHills.Editor
         {
             if (layout.light_fx == null || layout.light_fx.clover == null)
                 throw new InvalidDataException("Forest layout is missing the light_fx.clover configuration.");
-            string dotPath = Path.Combine("Assets/_Project/Art/FX", layout.light_fx.clover.sprite).Replace('\\', '/');
-            Sprite softDot = LoadSprite(dotPath);
-            Material softDotMaterial = GetSoftDotAdditiveMaterial(softDot.texture);
             int count = 0;
             foreach (float[] coordinate in layout.lights ?? Array.Empty<float[]>())
             {
@@ -1069,17 +1179,6 @@ namespace TheFairyHills.Editor
                 var lightObject = new GameObject($"Clover Point Light {count:00}");
                 lightObject.transform.position = new Vector3(coordinate[0], coordinate[1], -0.1f);
                 ConfigurePointLight(lightObject, layout.light_fx.clover, true);
-
-                SpriteRenderer dot = CreateScaledSprite(lightObject.transform, softDot,
-                    layout.light_fx.clover.sprite_size > 0f ? layout.light_fx.clover.sprite_size : 0.25f,
-                    layout.light_fx.clover.sprite_size > 0f ? layout.light_fx.clover.sprite_size : 0.25f, 12);
-                dot.gameObject.name = "Clover Soft Dot";
-                dot.sharedMaterial = softDotMaterial;
-                dot.color = Color.white;
-                var properties = new MaterialPropertyBlock();
-                dot.GetPropertyBlock(properties);
-                properties.SetColor(Shader.PropertyToID("_BaseColor"), ParseHtmlColor(layout.light_fx.clover.color));
-                dot.SetPropertyBlock(properties);
             }
             if (count != 9)
                 Debug.LogWarning($"Forest layout contains {count} clover light positions; the current lighting spec expects 9.");
@@ -1105,7 +1204,8 @@ namespace TheFairyHills.Editor
             throw new InvalidDataException($"Invalid light/layer color '{htmlColor}'.");
         }
 
-        private static ParticleSystem CreateSmoke(Transform parent, Vector3 localPosition, Vector2 area)
+        private static ParticleSystem CreateSmoke(Transform parent, Vector3 localPosition, Vector2 area,
+            out ParticleSystem sparks, out ParticleSystem glowSmoke)
         {
             GameObject smokeObject = new GameObject("Thorn Wall Purple Smoke");
             smokeObject.transform.SetParent(parent, false);
@@ -1144,7 +1244,7 @@ namespace TheFairyHills.Editor
             size.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(1f, 1.5f)));
             ParticleSystemRenderer smokeRenderer = particles.GetComponent<ParticleSystemRenderer>();
             smokeRenderer.renderMode = ParticleSystemRenderMode.Billboard;
-            smokeRenderer.sortingOrder = 14;
+            smokeRenderer.sortingOrder = 25;
             smokeRenderer.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(SoftParticleMaterialPath);
 
             GameObject emberObject = new GameObject("Dark Red Embers");
@@ -1168,12 +1268,138 @@ namespace TheFairyHills.Editor
             emberVelocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
             ParticleSystemRenderer emberRenderer = embers.GetComponent<ParticleSystemRenderer>();
             emberRenderer.renderMode = ParticleSystemRenderMode.Billboard;
-            emberRenderer.sortingOrder = 15;
+            emberRenderer.sortingOrder = 25;
             emberRenderer.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(EmberMaterialPath);
             ParticleSystem.SubEmittersModule subEmitters = particles.subEmitters;
             subEmitters.AddSubEmitter(embers, ParticleSystemSubEmitterType.Birth,
                 ParticleSystemSubEmitterProperties.InheritNothing, 0.12f);
+            sparks = CreateIronPulseSparks(smokeObject.transform, area);
+            glowSmoke = CreateIronPulseGlowSmoke(smokeObject.transform, area);
             return particles;
+        }
+
+        private static ParticleSystem CreateIronPulseSparks(Transform parent, Vector2 area)
+        {
+            var sparksObject = new GameObject("IronPulse Additive Sparks");
+            sparksObject.transform.SetParent(parent, false);
+            ParticleSystem sparks = sparksObject.AddComponent<ParticleSystem>();
+            ParticleSystem.MainModule main = sparks.main;
+            main.loop = false;
+            main.playOnAwake = false;
+            main.duration = 1.5f;
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.8f, 1.8f);
+            main.startSpeed = 0f;
+            main.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.25f);
+            main.startColor = Color.white;
+            main.maxParticles = 300;
+            ParticleSystem.EmissionModule emission = sparks.emission;
+            emission.rateOverTime = 60f;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 150) });
+            ParticleSystem.ShapeModule shape = sparks.shape;
+            shape.enabled = true;
+            shape.shapeType = ParticleSystemShapeType.Cone;
+            shape.angle = 30f;
+            shape.radius = Mathf.Max(0.1f, area.x * 0.2f);
+            ParticleSystem.VelocityOverLifetimeModule velocity = sparks.velocityOverLifetime;
+            velocity.enabled = true;
+            velocity.space = ParticleSystemSimulationSpace.Local;
+            velocity.x = new ParticleSystem.MinMaxCurve(0f, 0f);
+            velocity.y = new ParticleSystem.MinMaxCurve(2f, 6f);
+            velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
+            ParticleSystem.NoiseModule noise = sparks.noise;
+            noise.enabled = true;
+            noise.strength = 1f;
+            noise.frequency = 0.8f;
+            ParticleSystem.ColorOverLifetimeModule color = sparks.colorOverLifetime;
+            color.enabled = true;
+            color.color = new ParticleSystem.MinMaxGradient(CreateColorAlphaGradient(
+                new[] { "#FFE6A0", "#FF5A1F", "#FF5A1F" }, new[] { 0f, 0.45f, 1f },
+                new[] { 1f, 0.85f, 0f }, new[] { 0f, 0.55f, 1f }));
+            ParticleSystem.TrailModule trails = sparks.trails;
+            trails.enabled = true;
+            trails.ratio = 0.5f;
+            trails.lifetime = 0.15f;
+            ParticleSystemRenderer renderer = sparks.GetComponent<ParticleSystemRenderer>();
+            renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            renderer.sortingOrder = 25;
+            renderer.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(EmberMaterialPath);
+            renderer.trailMaterial = renderer.sharedMaterial;
+            SetParticleBaseColor(renderer, Color.white);
+            return sparks;
+        }
+
+        private static ParticleSystem CreateIronPulseGlowSmoke(Transform parent, Vector2 area)
+        {
+            var smokeObject = new GameObject("IronPulse Additive Glow Smoke");
+            smokeObject.transform.SetParent(parent, false);
+            ParticleSystem smoke = smokeObject.AddComponent<ParticleSystem>();
+            ParticleSystem.MainModule main = smoke.main;
+            main.loop = false;
+            main.playOnAwake = false;
+            main.duration = 1.5f;
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(1.5f, 2.5f);
+            main.startSpeed = 0f;
+            main.startSize = new ParticleSystem.MinMaxCurve(2f, 4f);
+            main.startColor = Color.white;
+            main.maxParticles = 80;
+            ParticleSystem.EmissionModule emission = smoke.emission;
+            emission.rateOverTime = 0f;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 40) });
+            ParticleSystem.ShapeModule shape = smoke.shape;
+            shape.enabled = true;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = new Vector3(area.x, Mathf.Min(area.y, 2.5f), 0.1f);
+            ParticleSystem.VelocityOverLifetimeModule velocity = smoke.velocityOverLifetime;
+            velocity.enabled = true;
+            velocity.space = ParticleSystemSimulationSpace.Local;
+            velocity.x = new ParticleSystem.MinMaxCurve(0f, 0f);
+            velocity.y = new ParticleSystem.MinMaxCurve(1f, 2f);
+            velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
+            ParticleSystem.NoiseModule noise = smoke.noise;
+            noise.enabled = true;
+            noise.strength = 0.8f;
+            noise.frequency = 0.5f;
+            ParticleSystem.ColorOverLifetimeModule color = smoke.colorOverLifetime;
+            color.enabled = true;
+            color.color = new ParticleSystem.MinMaxGradient(CreateColorAlphaGradient(
+                new[] { "#FF7A3A", "#6A2A80", "#6A2A80" }, new[] { 0f, 0.5f, 1f },
+                new[] { 0.3f, 0.15f, 0f }, new[] { 0f, 0.5f, 1f }));
+            ParticleSystem.SizeOverLifetimeModule size = smoke.sizeOverLifetime;
+            size.enabled = true;
+            size.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(
+                new Keyframe(0f, 0.7f), new Keyframe(0.35f, 1f), new Keyframe(1f, 1.2f)));
+            ParticleSystemRenderer renderer = smoke.GetComponent<ParticleSystemRenderer>();
+            renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            renderer.sortingOrder = 25;
+            renderer.sharedMaterial = GetSoftDotAdditiveMaterial(LoadSprite("Assets/_Project/Art/FX/FX_soft_dot.png").texture);
+            SetParticleBaseColor(renderer, Color.white);
+            return smoke;
+        }
+
+        private static Gradient CreateColorAlphaGradient(string[] colors, float[] colorTimes,
+            float[] alphaValues, float[] alphaTimes)
+        {
+            if (colors.Length != colorTimes.Length || alphaValues.Length != alphaTimes.Length)
+                throw new ArgumentException("Gradient color and time arrays must have matching lengths.");
+            var colorKeys = new GradientColorKey[colors.Length];
+            for (int i = 0; i < colors.Length; i++)
+                colorKeys[i] = new GradientColorKey(ParseHtmlColor(colors[i]), colorTimes[i]);
+            var alphaKeys = new GradientAlphaKey[alphaValues.Length];
+            for (int i = 0; i < alphaValues.Length; i++)
+                alphaKeys[i] = new GradientAlphaKey(alphaValues[i], alphaTimes[i]);
+            var gradient = new Gradient();
+            gradient.SetKeys(colorKeys, alphaKeys);
+            return gradient;
+        }
+
+        private static void SetParticleBaseColor(ParticleSystemRenderer renderer, Color color)
+        {
+            var properties = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(properties);
+            properties.SetColor(Shader.PropertyToID("_BaseColor"), color);
+            renderer.SetPropertyBlock(properties);
         }
 
         private static Gradient CreateAlphaFadeGradient(Color color)

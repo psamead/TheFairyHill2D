@@ -56,11 +56,11 @@
       "w": 6.72,
       "h": 3.0,
       "base": 0,
-      "label": "荆棘丛（装饰，在妮芙前面，包住十字架）",
+      "label": "荆棘丛（装饰，在妮芙后面，包住十字架）",
       "kind": "deco",
       "sprite": "props/F_prop_bramble_v3.png",
       "solid": false,
-      "sorting_order": 12
+      "sorting_order": -3
     },
     {
       "x": 49.2,
@@ -86,7 +86,7 @@
       "sprite": "props/F_prop_cross_v2.png",
       "reveal_radius": 2.5,
       "hint_fx": "FX/FX_sparkle_star.png",
-      "sorting_order": 11,
+      "sorting_order": -4,
       "hint_trigger_x": 44.6
     },
     {
@@ -212,9 +212,7 @@
       "intensity": 0.6,
       "radius": 1.2,
       "inner_radius": 0.0,
-      "falloff_intensity": 0.7,
-      "sprite": "FX_soft_dot.png",
-      "sprite_size": 0.25
+      "falloff_intensity": 0.7
     },
     "cross": {
       "color": "#F2D28A",

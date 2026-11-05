@@ -7,9 +7,12 @@ namespace TheFairyHills.Gameplay
     [RequireComponent(typeof(Collider2D))]
     public sealed class IronCrossPickup : MonoBehaviour
     {
+        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         [SerializeField] private SpriteRenderer crossRenderer;
         [SerializeField] private ParticleSystem hintStars;
+        [SerializeField] private ParticleSystem spinningHintStars;
         [SerializeField] private SpriteRenderer mainStar;
+        [SerializeField] private SpriteRenderer starHalo;
         [SerializeField] private Light2D crossLight;
         [SerializeField] private float crossLightIntensity = 0.8f;
         [SerializeField] private float revealRadius = 2.5f;
@@ -19,6 +22,13 @@ namespace TheFairyHills.Gameplay
         private bool collected;
         private bool hintStarted;
         private Vector3 mainStarScale;
+        private Vector3 haloScale;
+        private Quaternion mainStarRotation;
+        private float mainStarPulseStartTime;
+        private float nextMainStarSpinTime;
+        private float mainStarSpinStartTime = -1f;
+        private MaterialPropertyBlock mainStarProperties;
+        private MaterialPropertyBlock haloProperties;
 
         public void Configure(SpriteRenderer cross, ParticleSystem stars, float radius)
         {
@@ -27,15 +37,23 @@ namespace TheFairyHills.Gameplay
 
         public void Configure(SpriteRenderer cross, ParticleSystem stars, SpriteRenderer star, float radius, float triggerX)
         {
-            Configure(cross, stars, star, null, 0.8f, radius, triggerX);
+            Configure(cross, stars, null, star, null, null, 0.8f, radius, triggerX);
         }
 
         public void Configure(SpriteRenderer cross, ParticleSystem stars, SpriteRenderer star, Light2D light,
             float lightIntensity, float radius, float triggerX)
         {
+            Configure(cross, stars, null, star, null, light, lightIntensity, radius, triggerX);
+        }
+
+        public void Configure(SpriteRenderer cross, ParticleSystem stars, ParticleSystem spinningStars,
+            SpriteRenderer star, SpriteRenderer halo, Light2D light, float lightIntensity, float radius, float triggerX)
+        {
             crossRenderer = cross;
             hintStars = stars;
+            spinningHintStars = spinningStars;
             mainStar = star;
+            starHalo = halo;
             crossLight = light;
             crossLightIntensity = lightIntensity;
             revealRadius = radius;
@@ -62,10 +80,17 @@ namespace TheFairyHills.Gameplay
                 crossRenderer.color = color;
             }
             if (hintStars != null) hintStars.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            if (spinningHintStars != null) spinningHintStars.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             if (mainStar != null)
             {
                 mainStarScale = mainStar.transform.localScale;
+                mainStarRotation = mainStar.transform.localRotation;
                 mainStar.gameObject.SetActive(false);
+            }
+            if (starHalo != null)
+            {
+                haloScale = starHalo.transform.localScale;
+                starHalo.gameObject.SetActive(false);
             }
         }
 
@@ -73,9 +98,7 @@ namespace TheFairyHills.Gameplay
         {
             if (collected) return;
             if (player == null) player = FindFirstObjectByType<PlayerController2D>();
-            if (player == null) return;
-
-            if (!hintStarted && player.transform.position.x > hintTriggerX)
+            if (player != null && !hintStarted && player.transform.position.x > hintTriggerX)
             {
                 hintStarted = true;
                 if (crossLight != null)
@@ -85,26 +108,18 @@ namespace TheFairyHills.Gameplay
                 }
                 if (hintStars != null)
                 {
-                    if (revealed)
-                    {
-                        ParticleSystem.EmissionModule emission = hintStars.emission;
-                        emission.rateOverTime = new ParticleSystem.MinMaxCurve(1f, 1.5f);
-                    }
                     hintStars.Play();
                 }
+                if (spinningHintStars != null) spinningHintStars.Play();
+                mainStarPulseStartTime = Time.time;
+                nextMainStarSpinTime = Time.time + Random.Range(2.5f, 4f);
                 if (mainStar != null) mainStar.gameObject.SetActive(true);
+                if (starHalo != null) starHalo.gameObject.SetActive(true);
             }
 
-            if (hintStarted && mainStar != null)
-            {
-                float blink = (Mathf.Sin(Time.time * Mathf.PI * 2f / 0.3f) + 1f) * 0.5f;
-                Color color = mainStar.color;
-                color.a = Mathf.Lerp(0.22f, 1f, blink);
-                mainStar.color = color;
-                mainStar.transform.localScale = mainStarScale * Mathf.Lerp(0.8f, 1.08f, blink);
-            }
+            if (hintStarted) UpdateMainStar();
 
-            if (revealed || Vector2.Distance(player.transform.position, transform.position) > revealRadius) return;
+            if (player == null || revealed || Vector2.Distance(player.transform.position, transform.position) > revealRadius) return;
 
             revealed = true;
             if (crossRenderer != null)
@@ -120,6 +135,52 @@ namespace TheFairyHills.Gameplay
             }
         }
 
+        private void UpdateMainStar()
+        {
+            if (mainStar == null) return;
+
+            float now = Time.time;
+            float pulse = (Mathf.Sin((now - mainStarPulseStartTime) * (Mathf.PI * 2f / 1.2f)) + 1f) * 0.5f;
+            float popScale = 1f;
+            Quaternion rotation = mainStarRotation;
+            if (mainStarSpinStartTime < 0f && now >= nextMainStarSpinTime)
+                mainStarSpinStartTime = now;
+
+            if (mainStarSpinStartTime >= 0f)
+            {
+                float progress = Mathf.Clamp01((now - mainStarSpinStartTime) / 0.4f);
+                rotation = mainStarRotation * Quaternion.Euler(0f, 0f, 360f * progress);
+                popScale = 1f + 0.4f * Mathf.Sin(Mathf.PI * progress);
+                if (progress >= 1f)
+                {
+                    mainStarSpinStartTime = -1f;
+                    nextMainStarSpinTime = now + Random.Range(2.5f, 4f);
+                    rotation = mainStarRotation;
+                    popScale = 1f;
+                }
+            }
+
+            mainStar.transform.localRotation = rotation;
+            mainStar.transform.localScale = mainStarScale * Mathf.Lerp(0.85f, 1.15f, pulse) * popScale;
+            SetAdditiveColor(mainStar, new Color(1f, 224f / 255f, 157f / 255f, Mathf.Lerp(0.6f, 1f, pulse)),
+                ref mainStarProperties);
+
+            if (starHalo == null) return;
+            starHalo.transform.localScale = haloScale * Mathf.Lerp(0.95f, 1.05f, pulse) * popScale;
+            SetAdditiveColor(starHalo, new Color(242f / 255f, 210f / 255f, 138f / 255f,
+                0.35f * Mathf.Lerp(0.65f, 1f, pulse)), ref haloProperties);
+        }
+
+        private static void SetAdditiveColor(SpriteRenderer renderer, Color color, ref MaterialPropertyBlock properties)
+        {
+            if (renderer == null) return;
+            properties ??= new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(properties);
+            properties.SetColor(BaseColorId, color);
+            renderer.SetPropertyBlock(properties);
+            renderer.color = Color.white;
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (collected) return;
@@ -130,8 +191,10 @@ namespace TheFairyHills.Gameplay
             Collider2D trigger = GetComponent<Collider2D>();
             if (trigger != null) trigger.enabled = false;
             if (crossRenderer != null) crossRenderer.enabled = false;
-            if (hintStars != null) hintStars.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            if (hintStars != null) hintStars.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            if (spinningHintStars != null) spinningHintStars.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             if (mainStar != null) mainStar.gameObject.SetActive(false);
+            if (starHalo != null) starHalo.gameObject.SetActive(false);
             StartCoroutine(FadeLightAndDisable());
         }
 
