@@ -207,13 +207,6 @@
     }
   },
   "light_fx": {
-    "clover": {
-      "color": "#BFE8B0",
-      "intensity": 0.6,
-      "radius": 1.2,
-      "inner_radius": 0.0,
-      "falloff_intensity": 0.7
-    },
     "cross": {
       "color": "#F2D28A",
       "intensity": 0.8,

@@ -120,7 +120,6 @@ namespace TheFairyHills.Editor
     [Serializable]
     internal sealed class Chapter1ForestLightFxData
     {
-        public Chapter1LightData clover;
         public Chapter1LightData cross;
         public Chapter1LightData thornwall;
         public Chapter1LightData exit;
@@ -153,6 +152,8 @@ namespace TheFairyHills.Editor
         private const string HudFramePath = "Assets/_Project/Art/UI/HUD/UI_frame_thin.png";
         private const string HudPanelPath = "Assets/_Project/Art/UI/HUD/UI_panel_dark.png";
         private const string EmberMaterialPath = "Assets/_Project/Art/FX/M_FX_EmberAdditive.mat";
+        private const string ShamrockIconPath = "Assets/_Project/Art/FX/Shamrock/FX_shamrock_128.png";
+        private const string ShamrockGlowPath = "Assets/_Project/Art/FX/Shamrock/FX_shamrock_glow.png";
 
         [MenuItem("Tools/The Fairy Hills/Build Chapter 1 Scenes")]
         private static void BuildFromMenu() => BuildBothScenes();
@@ -282,6 +283,44 @@ namespace TheFairyHills.Editor
             BuildScene(forest, ForestScenePath, true);
             AssetDatabase.SaveAssets();
             Debug.Log("Built Revision v3 Fix C: Village and Forest only. Core, MainMenu, HUD, audio, and Build Settings were left unchanged.");
+        }
+
+        [MenuItem("Tools/The Fairy Hills/Build Shamrock E - Village and Forest")]
+        public static void BuildShamrockE()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode before building Shamrock E.");
+
+            Scene activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.IsValid() && activeScene.isDirty)
+                throw new InvalidOperationException($"Save the dirty scene '{activeScene.path}' before building Shamrock E.");
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ConfigureShamrockAssets();
+            Chapter1LayoutData village = LoadLayout(VillageLayoutPath);
+            Chapter1LayoutData forest = LoadLayout(ForestLayoutPath);
+            BuildScene(village, VillageScenePath, false);
+            BuildScene(forest, ForestScenePath, true);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Built Shamrock E: Village and Forest collectibles only. Core, MainMenu, HUD, audio, and Build Settings were left unchanged.");
+        }
+
+        private static void ConfigureShamrockAssets()
+        {
+            string[] shamrockSprites =
+            {
+                ShamrockIconPath,
+                "Assets/_Project/Art/FX/Shamrock/FX_shamrock_256.png",
+                ShamrockGlowPath
+            };
+            foreach (string path in shamrockSprites) ConfigureSpriteImport(path, false, false, false, true);
+
+            Sprite icon = LoadSprite(ShamrockIconPath);
+            Sprite glow = LoadSprite(ShamrockGlowPath);
+            Sprite softDot = LoadSprite("Assets/_Project/Art/FX/FX_soft_dot.png");
+            GetShamrockMaterial("Assets/_Project/Art/FX/M_FX_ShamrockIconAdditive.mat", icon.texture);
+            GetShamrockMaterial("Assets/_Project/Art/FX/M_FX_ShamrockGlowAdditive.mat", glow.texture);
+            GetSoftDotAdditiveMaterial(softDot.texture);
         }
 
         private static void ConfigureBatchBForestAssets()
@@ -567,12 +606,18 @@ namespace TheFairyHills.Editor
 
         private static void ConfigureSpriteImport(string path, bool groundLinePivot, bool compressed, bool bottomCenterPivot)
         {
+            ConfigureSpriteImport(path, groundLinePivot, compressed, bottomCenterPivot, false);
+        }
+
+        private static void ConfigureSpriteImport(string path, bool groundLinePivot, bool compressed,
+            bool bottomCenterPivot, bool centerPivot)
+        {
             TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
             if (importer == null) throw new InvalidOperationException($"Texture importer not available for {path}.");
 
             importer.GetSourceTextureWidthAndHeight(out int width, out int height);
-            Vector2 pivot = bottomCenterPivot ? new Vector2(0.5f, 0f) : groundLinePivot ? new Vector2(0f, 270f / height) :
-                path == NiamhSpritePath ? new Vector2(0.5f, 0f) : Vector2.zero;
+            Vector2 pivot = centerPivot ? new Vector2(0.5f, 0.5f) : bottomCenterPivot ? new Vector2(0.5f, 0f) :
+                groundLinePivot ? new Vector2(0f, 270f / height) : path == NiamhSpritePath ? new Vector2(0.5f, 0f) : Vector2.zero;
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             TextureImporterSettings settings = new TextureImporterSettings();
@@ -621,9 +666,10 @@ namespace TheFairyHills.Editor
                 else if (interaction.type == "exit") CreateSceneExit(interaction, forest, forest ? layout.light_fx : null);
             }
 
+            CreateShamrockCollectibles(layout);
+
             if (forest)
             {
-                CreateForestHelperLights(layout);
                 ThornWall wall = UnityEngine.Object.FindFirstObjectByType<ThornWall>();
                 GameObject exitObject = GameObject.Find("Exit_To_S2");
                 Light2D exitLight = exitObject != null ? exitObject.GetComponentInChildren<Light2D>(true) : null;
@@ -1167,21 +1213,107 @@ namespace TheFairyHills.Editor
             sceneExit.Configure(forest ? string.Empty : "Ch1_S1b_ForestPath", forest, forest, "Spawn_FromVillage");
         }
 
-        private static void CreateForestHelperLights(Chapter1LayoutData layout)
+        private static void CreateShamrockCollectibles(Chapter1LayoutData layout)
         {
-            if (layout.light_fx == null || layout.light_fx.clover == null)
-                throw new InvalidDataException("Forest layout is missing the light_fx.clover configuration.");
             int count = 0;
             foreach (float[] coordinate in layout.lights ?? Array.Empty<float[]>())
             {
                 if (coordinate == null || coordinate.Length < 2) continue;
                 count++;
-                var lightObject = new GameObject($"Clover Point Light {count:00}");
-                lightObject.transform.position = new Vector3(coordinate[0], coordinate[1], -0.1f);
-                ConfigurePointLight(lightObject, layout.light_fx.clover, true);
+                CreateShamrockCollectible(count, coordinate[0], coordinate[1]);
             }
-            if (count != 9)
-                Debug.LogWarning($"Forest layout contains {count} clover light positions; the current lighting spec expects 9.");
+            if (count == 0)
+                Debug.LogWarning($"Layout '{layout.id}' contains no shamrock collectible coordinates.");
+        }
+
+        private static void CreateShamrockCollectible(int index, float x, float y)
+        {
+            Sprite icon = LoadSprite(ShamrockIconPath);
+            Sprite glow = LoadSprite(ShamrockGlowPath);
+            Sprite softDot = LoadSprite("Assets/_Project/Art/FX/FX_soft_dot.png");
+            GameObject root = new GameObject($"ShamrockLight_{index:00}");
+            root.transform.position = new Vector3(x, y, -0.1f);
+
+            GameObject glowObject = new GameObject("Additive Glow");
+            glowObject.transform.SetParent(root.transform, false);
+            glowObject.transform.localScale = Vector3.one * (1f / glow.bounds.size.x);
+            SpriteRenderer glowRenderer = glowObject.AddComponent<SpriteRenderer>();
+            glowRenderer.sprite = glow;
+            glowRenderer.material = AssetDatabase.LoadAssetAtPath<Material>(
+                "Assets/_Project/Art/FX/M_FX_ShamrockGlowAdditive.mat");
+            glowRenderer.sortingOrder = 10;
+
+            GameObject iconObject = new GameObject("Icon");
+            iconObject.transform.SetParent(root.transform, false);
+            iconObject.transform.localScale = Vector3.one * (0.35f / icon.bounds.size.x);
+            SpriteRenderer iconRenderer = iconObject.AddComponent<SpriteRenderer>();
+            iconRenderer.sprite = icon;
+            iconRenderer.material = AssetDatabase.LoadAssetAtPath<Material>(
+                "Assets/_Project/Art/FX/M_FX_ShamrockIconAdditive.mat");
+            iconRenderer.sortingOrder = 11;
+
+            CircleCollider2D trigger = root.AddComponent<CircleCollider2D>();
+            trigger.isTrigger = true;
+            trigger.radius = 0.3f;
+
+            GameObject burstObject = new GameObject("Collect Burst");
+            burstObject.transform.SetParent(root.transform, false);
+            ParticleSystem burst = ConfigureShamrockBurst(burstObject, softDot);
+            root.AddComponent<ShamrockLight>().Configure(iconRenderer, glowRenderer, burst);
+        }
+
+        private static ParticleSystem ConfigureShamrockBurst(GameObject burstObject, Sprite softDot)
+        {
+            ParticleSystem particles = burstObject.AddComponent<ParticleSystem>();
+            ParticleSystem.MainModule main = particles.main;
+            main.loop = false;
+            main.playOnAwake = false;
+            main.duration = 0.4f;
+            main.startLifetime = 0.4f;
+            main.startSpeed = new ParticleSystem.MinMaxCurve(1f, 2f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.06f, 0.12f);
+            main.startColor = new ParticleSystem.MinMaxGradient(new Color32(191, 232, 176, 255));
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.maxParticles = 12;
+
+            ParticleSystem.EmissionModule emission = particles.emission;
+            emission.enabled = true;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 12) });
+            ParticleSystem.ShapeModule shape = particles.shape;
+            shape.enabled = true;
+            shape.shapeType = ParticleSystemShapeType.Sphere;
+            shape.radius = 0.04f;
+            ParticleSystem.VelocityOverLifetimeModule velocity = particles.velocityOverLifetime;
+            velocity.enabled = true;
+            velocity.space = ParticleSystemSimulationSpace.World;
+            velocity.x = new ParticleSystem.MinMaxCurve(0f, 0f);
+            velocity.y = new ParticleSystem.MinMaxCurve(0f, 0f);
+            velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
+            ParticleSystemRenderer renderer = particles.GetComponent<ParticleSystemRenderer>();
+            renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            renderer.sortingOrder = 12;
+            renderer.material = GetSoftDotAdditiveMaterial(softDot.texture);
+            SetParticleBaseColor(renderer, Color.white);
+            return particles;
+        }
+
+        private static Material GetShamrockMaterial(string path, Texture texture)
+        {
+            Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (shader == null) throw new InvalidOperationException("URP Particles/Unlit shader is unavailable.");
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material == null)
+            {
+                material = new Material(shader) { name = Path.GetFileNameWithoutExtension(path) };
+                AssetDatabase.CreateAsset(material, path);
+            }
+            else material.shader = shader;
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_Blend", 2f);
+            material.SetColor("_BaseColor", Color.white);
+            EditorUtility.SetDirty(material);
+            return material;
         }
 
         private static Light2D ConfigurePointLight(GameObject lightObject, Chapter1LightData settings, bool enabled)

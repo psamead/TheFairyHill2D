@@ -7,6 +7,7 @@ namespace TheFairyHills.Gameplay
     {
         public static GameState Instance { get; private set; }
         public bool HasIronCross { get; private set; }
+        public int ShamrockCount { get; private set; }
 
         private void Awake()
         {
@@ -24,5 +25,7 @@ namespace TheFairyHills.Gameplay
         }
 
         public void CollectIronCross() => HasIronCross = true;
+
+        public void CollectShamrock() => ShamrockCount++;
     }
 }
