@@ -17,6 +17,9 @@ namespace TheFairyHills.Gameplay
         [SerializeField] private float crossLightIntensity = 0.8f;
         [SerializeField] private float revealRadius = 2.5f;
         [SerializeField] private float hintTriggerX = float.NegativeInfinity;
+        [SerializeField] private AudioSource pickupAudioSource;
+        [SerializeField] private AudioClip pickupClip;
+        [SerializeField] private AudioSource levelMusicSource;
         private PlayerController2D player;
         private bool revealed;
         private bool collected;
@@ -25,10 +28,9 @@ namespace TheFairyHills.Gameplay
         private Vector3 haloScale;
         private Quaternion mainStarRotation;
         private float mainStarPulseStartTime;
-        private float nextMainStarSpinTime;
-        private float mainStarSpinStartTime = -1f;
         private MaterialPropertyBlock mainStarProperties;
         private MaterialPropertyBlock haloProperties;
+        private Coroutine musicDuckRoutine;
 
         public void Configure(SpriteRenderer cross, ParticleSystem stars, float radius)
         {
@@ -49,6 +51,14 @@ namespace TheFairyHills.Gameplay
         public void Configure(SpriteRenderer cross, ParticleSystem stars, ParticleSystem spinningStars,
             SpriteRenderer star, SpriteRenderer halo, Light2D light, float lightIntensity, float radius, float triggerX)
         {
+            Configure(cross, stars, spinningStars, star, halo, light, lightIntensity, radius, triggerX,
+                null, null, null);
+        }
+
+        public void Configure(SpriteRenderer cross, ParticleSystem stars, ParticleSystem spinningStars,
+            SpriteRenderer star, SpriteRenderer halo, Light2D light, float lightIntensity, float radius, float triggerX,
+            AudioSource pickupSource, AudioClip pickupSfx, AudioSource musicSource)
+        {
             crossRenderer = cross;
             hintStars = stars;
             spinningHintStars = spinningStars;
@@ -58,7 +68,20 @@ namespace TheFairyHills.Gameplay
             crossLightIntensity = lightIntensity;
             revealRadius = radius;
             hintTriggerX = triggerX;
+            pickupAudioSource = pickupSource;
+            pickupClip = pickupSfx;
+            levelMusicSource = musicSource;
+            if (pickupAudioSource != null)
+            {
+                pickupAudioSource.playOnAwake = false;
+                pickupAudioSource.loop = false;
+                pickupAudioSource.spatialBlend = 0f;
+                pickupAudioSource.volume = 0.7f;
+            }
+            if (levelMusicSource != null) musicBaseVolume = levelMusicSource.volume;
         }
+
+        private float musicBaseVolume = 0.5f;
 
         private void Start()
         {
@@ -112,7 +135,6 @@ namespace TheFairyHills.Gameplay
                 }
                 if (spinningHintStars != null) spinningHintStars.Play();
                 mainStarPulseStartTime = Time.time;
-                nextMainStarSpinTime = Time.time + Random.Range(2.5f, 4f);
                 if (mainStar != null) mainStar.gameObject.SetActive(true);
                 if (starHalo != null) starHalo.gameObject.SetActive(true);
             }
@@ -131,7 +153,7 @@ namespace TheFairyHills.Gameplay
             if (hintStars != null)
             {
                 ParticleSystem.EmissionModule emission = hintStars.emission;
-                emission.rateOverTime = new ParticleSystem.MinMaxCurve(1f, 1.5f);
+                emission.rateOverTime = new ParticleSystem.MinMaxCurve(0.5f, 0.75f);
             }
         }
 
@@ -139,36 +161,25 @@ namespace TheFairyHills.Gameplay
         {
             if (mainStar == null) return;
 
-            float now = Time.time;
-            float pulse = (Mathf.Sin((now - mainStarPulseStartTime) * (Mathf.PI * 2f / 1.2f)) + 1f) * 0.5f;
-            float popScale = 1f;
-            Quaternion rotation = mainStarRotation;
-            if (mainStarSpinStartTime < 0f && now >= nextMainStarSpinTime)
-                mainStarSpinStartTime = now;
-
-            if (mainStarSpinStartTime >= 0f)
-            {
-                float progress = Mathf.Clamp01((now - mainStarSpinStartTime) / 0.4f);
-                rotation = mainStarRotation * Quaternion.Euler(0f, 0f, 360f * progress);
-                popScale = 1f + 0.4f * Mathf.Sin(Mathf.PI * progress);
-                if (progress >= 1f)
-                {
-                    mainStarSpinStartTime = -1f;
-                    nextMainStarSpinTime = now + Random.Range(2.5f, 4f);
-                    rotation = mainStarRotation;
-                    popScale = 1f;
-                }
-            }
-
-            mainStar.transform.localRotation = rotation;
-            mainStar.transform.localScale = mainStarScale * Mathf.Lerp(0.85f, 1.15f, pulse) * popScale;
-            SetAdditiveColor(mainStar, new Color(1f, 224f / 255f, 157f / 255f, Mathf.Lerp(0.6f, 1f, pulse)),
+            float elapsed = Mathf.Max(0f, Time.time - mainStarPulseStartTime);
+            int breathIndex = Mathf.FloorToInt(elapsed / 1.2f);
+            float phase = Mathf.Repeat(elapsed, 1.2f) / 1.2f;
+            float inhale = Mathf.SmoothStep(0f, 1f, phase < 0.5f ? phase * 2f : 1f);
+            float exhale = phase < 0.5f ? inhale : 1f - Mathf.SmoothStep(0f, 1f, (phase - 0.5f) * 2f);
+            float breath = phase < 0.5f ? inhale : exhale;
+            float flash = (breathIndex + 1) % 3 == 0 && phase >= 0.5f && phase < 0.625f
+                ? Mathf.Sin(Mathf.PI * (phase - 0.5f) / 0.125f)
+                : 0f;
+            mainStar.transform.localScale = mainStarScale * Mathf.Lerp(0.85f, 1.15f, breath) * Mathf.Lerp(1f, 1.5f, flash);
+            float angle = (breathIndex + inhale) * 45f;
+            mainStar.transform.localRotation = mainStarRotation * Quaternion.Euler(0f, 0f, angle);
+            SetAdditiveColor(mainStar, new Color(1f, 224f / 255f, 157f / 255f, Mathf.Lerp(0.6f, 1f, breath)),
                 ref mainStarProperties);
 
             if (starHalo == null) return;
-            starHalo.transform.localScale = haloScale * Mathf.Lerp(0.95f, 1.05f, pulse) * popScale;
+            starHalo.transform.localScale = haloScale * Mathf.Lerp(0.95f, 1.05f, breath) * Mathf.Lerp(1f, 1.5f, flash);
             SetAdditiveColor(starHalo, new Color(242f / 255f, 210f / 255f, 138f / 255f,
-                0.35f * Mathf.Lerp(0.65f, 1f, pulse)), ref haloProperties);
+                Mathf.Lerp(0.2f, 0.45f, breath) + (0.8f - Mathf.Lerp(0.2f, 0.45f, breath)) * flash), ref haloProperties);
         }
 
         private static void SetAdditiveColor(SpriteRenderer renderer, Color color, ref MaterialPropertyBlock properties)
@@ -188,6 +199,8 @@ namespace TheFairyHills.Gameplay
             if (enteringPlayer == null) return;
             collected = true;
             enteringPlayer.CollectIronCross();
+            if (pickupAudioSource != null && pickupClip != null) pickupAudioSource.PlayOneShot(pickupClip);
+            if (levelMusicSource != null) musicDuckRoutine = StartCoroutine(DuckMusicForPickup());
             Collider2D trigger = GetComponent<Collider2D>();
             if (trigger != null) trigger.enabled = false;
             if (crossRenderer != null) crossRenderer.enabled = false;
@@ -196,6 +209,14 @@ namespace TheFairyHills.Gameplay
             if (mainStar != null) mainStar.gameObject.SetActive(false);
             if (starHalo != null) starHalo.gameObject.SetActive(false);
             StartCoroutine(FadeLightAndDisable());
+        }
+
+        private System.Collections.IEnumerator DuckMusicForPickup()
+        {
+            levelMusicSource.volume = musicBaseVolume * 0.5f;
+            yield return new WaitForSecondsRealtime(0.5f);
+            if (levelMusicSource != null) levelMusicSource.volume = musicBaseVolume;
+            musicDuckRoutine = null;
         }
 
         private System.Collections.IEnumerator FadeLightAndDisable()
@@ -212,6 +233,7 @@ namespace TheFairyHills.Gameplay
                 yield return null;
             }
             if (crossLight != null) crossLight.enabled = false;
+            if (musicDuckRoutine != null) yield return musicDuckRoutine;
             gameObject.SetActive(false);
         }
     }

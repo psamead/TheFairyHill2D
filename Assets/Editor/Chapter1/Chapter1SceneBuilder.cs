@@ -154,6 +154,17 @@ namespace TheFairyHills.Editor
         private const string EmberMaterialPath = "Assets/_Project/Art/FX/M_FX_EmberAdditive.mat";
         private const string ShamrockIconPath = "Assets/_Project/Art/FX/Shamrock/FX_shamrock_128.png";
         private const string ShamrockGlowPath = "Assets/_Project/Art/FX/Shamrock/FX_shamrock_glow.png";
+        private const string ThornBurnMaskPath = "Assets/_Project/Art/Backgrounds/S1b_ForestPath/props/F_prop_thornwall_v4_burnmask.png";
+        private const string ThornBurnShaderPath = "Assets/_Project/Shaders/ThornWallBurnDissolve.shader";
+        private const string ThornBurnMaterialPath = "Assets/_Project/Art/FX/M_FX_ThornWallBurn.mat";
+        private const string VillageMusicPath = "Assets/_Project/Audio/Music/S1_VILLAGE_BGM_v1_loop.ogg";
+        private const string ForestMusicPath = "Assets/_Project/Audio/Music/S1b_FOREST_BGM_v1_loop.ogg";
+        private const string GateCreak1Path = "Assets/_Project/Audio/SFX/SFX_Gate_Creak_01_v3.ogg";
+        private const string GateCreak2Path = "Assets/_Project/Audio/SFX/SFX_Gate_Creak_02_v3.ogg";
+        private const string GateCreak3Path = "Assets/_Project/Audio/SFX/SFX_Gate_Creak_03_v3.ogg";
+        private const string GateLatchPath = "Assets/_Project/Audio/SFX/SFX_Gate_Latch_v3.ogg";
+        private const string CrossPickupPath = "Assets/_Project/Audio/SFX/SFX_cross_pickup.ogg";
+        private const string ThornBanishPath = "Assets/_Project/Audio/SFX/SFX_thornwall_banish.ogg";
 
         [MenuItem("Tools/The Fairy Hills/Build Chapter 1 Scenes")]
         private static void BuildFromMenu() => BuildBothScenes();
@@ -303,6 +314,90 @@ namespace TheFairyHills.Editor
             BuildScene(forest, ForestScenePath, true);
             AssetDatabase.SaveAssets();
             Debug.Log("Built Shamrock E: Village and Forest collectibles only. Core, MainMenu, HUD, audio, and Build Settings were left unchanged.");
+        }
+
+        [MenuItem("Tools/The Fairy Hills/Build Revision v3 Fix F - Burn, Stars, Audio")]
+        public static void BuildRevisionV3FixF()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode before building Revision v3 Fix F.");
+
+            Scene activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.IsValid() && activeScene.isDirty)
+                throw new InvalidOperationException($"Save the dirty scene '{activeScene.path}' before building Revision v3 Fix F.");
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ConfigureSpriteImport("Assets/_Project/Art/FX/FX_sparkle_star.png", false, false, false, true);
+            ConfigureThornBurnAssets();
+            ConfigureFixFAudioImports();
+            Chapter1LayoutData village = LoadLayout(VillageLayoutPath);
+            Chapter1LayoutData forest = LoadLayout(ForestLayoutPath);
+            BuildScene(village, VillageScenePath, false);
+            BuildScene(forest, ForestScenePath, true);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Built Revision v3 Fix F: Village and Forest only. Core, MainMenu, HUD, and Build Settings were left unchanged.");
+        }
+
+        private static void ConfigureFixFAudioImports()
+        {
+            string[] paths =
+            {
+                VillageMusicPath, ForestMusicPath, GateCreak1Path, GateCreak2Path, GateCreak3Path,
+                GateLatchPath, CrossPickupPath, ThornBanishPath
+            };
+            foreach (string path in paths)
+            {
+                AudioImporter importer = AssetImporter.GetAtPath(path) as AudioImporter;
+                if (importer == null) throw new InvalidOperationException($"Audio importer not available for {path}.");
+                AudioImporterSampleSettings settings = importer.defaultSampleSettings;
+                settings.loadType = AudioClipLoadType.DecompressOnLoad;
+                settings.preloadAudioData = true;
+                importer.defaultSampleSettings = settings;
+                importer.SaveAndReimport();
+            }
+        }
+
+        private static void ConfigureThornBurnAssets()
+        {
+            TextureImporter maskImporter = AssetImporter.GetAtPath(ThornBurnMaskPath) as TextureImporter;
+            if (maskImporter == null) throw new InvalidOperationException("Thorn wall burn mask importer is unavailable.");
+            maskImporter.textureType = TextureImporterType.Default;
+            maskImporter.sRGBTexture = false;
+            maskImporter.mipmapEnabled = false;
+            maskImporter.textureCompression = TextureImporterCompression.Uncompressed;
+            maskImporter.wrapMode = TextureWrapMode.Clamp;
+            maskImporter.SaveAndReimport();
+
+            Shader shader = AssetDatabase.LoadAssetAtPath<Shader>(ThornBurnShaderPath);
+            if (shader == null) shader = Shader.Find("TheFairyHills/Thorn Wall Burn Dissolve");
+            if (shader == null) throw new InvalidOperationException("Thorn wall burn dissolve shader is unavailable.");
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(ThornBurnMaterialPath);
+            if (material == null)
+            {
+                material = new Material(shader) { name = "M_FX_ThornWallBurn" };
+                AssetDatabase.CreateAsset(material, ThornBurnMaterialPath);
+            }
+            else material.shader = shader;
+            material.SetTexture("_BurnMask", AssetDatabase.LoadAssetAtPath<Texture2D>(ThornBurnMaskPath));
+            material.SetFloat("_EdgeWidth", 0.06f);
+            material.SetFloat("_CharWidth", 0.03f);
+            material.SetColor("_EdgeColor", new Color(2f, 2f * 154f / 255f, 2f * 60f / 255f, 1f));
+            material.SetColor("_CharColor", new Color32(58, 14, 8, 255));
+            EditorUtility.SetDirty(material);
+        }
+
+        private static AudioSource CreateLevelMusic(bool forest)
+        {
+            GameObject musicObject = new GameObject("Level Music");
+            AudioSource source = musicObject.AddComponent<AudioSource>();
+            source.clip = AssetDatabase.LoadAssetAtPath<AudioClip>(forest ? ForestMusicPath : VillageMusicPath);
+            if (source.clip == null) throw new InvalidOperationException("Chapter level music clip is missing.");
+            source.playOnAwake = true;
+            source.loop = true;
+            source.volume = 0.5f;
+            source.spatialBlend = 0f;
+            source.dopplerLevel = 0f;
+            return source;
         }
 
         private static void ConfigureShamrockAssets()
@@ -646,6 +741,7 @@ namespace TheFairyHills.Editor
             Color ambientColor = forest ? new Color32(104, 120, 160, 255) : Color.white;
             info.Configure(forest ? "Ch1_S1b_ForestPath" : "Ch1_S1_Village", layout.length,
                 forest ? "MainMenu" : "Ch1_S1b_ForestPath", ambientColor, forest ? 0.28f : 1f, forest);
+            AudioSource levelMusic = CreateLevelMusic(forest);
             new GameObject("LevelBootstrap").AddComponent<LevelBootstrap>();
             float startX = forest ? 3.5f : 3.5f;
             foreach (Chapter1InteractData interaction in layout.interact ?? Array.Empty<Chapter1InteractData>())
@@ -662,7 +758,8 @@ namespace TheFairyHills.Editor
             foreach (Chapter1InteractData interaction in layout.interact ?? Array.Empty<Chapter1InteractData>())
             {
                 if (interaction.type == "reach") CreateVillageGate(interaction);
-                else if (interaction.type == "pickup_low") CreateIronCross(interaction, forest ? layout.light_fx : null);
+                else if (interaction.type == "pickup_low") CreateIronCross(interaction,
+                    forest ? layout.light_fx : null, forest ? levelMusic : null);
                 else if (interaction.type == "exit") CreateSceneExit(interaction, forest, forest ? layout.light_fx : null);
             }
 
@@ -986,9 +1083,15 @@ namespace TheFairyHills.Editor
                     redLight.intensity = (redSettings != null ? redSettings.intensity : 1.2f) * 0.5f;
                     redLight.shadowsEnabled = false;
                 }
+                AudioSource banishSource = root.AddComponent<AudioSource>();
+                banishSource.playOnAwake = false;
+                banishSource.spatialBlend = 0f;
+                banishSource.volume = 0.7f;
                 root.AddComponent<ThornWall>().Configure(renderer, barrier, smoke, glow, redLight,
                     flashLight, sparks, glowSmoke,
-                    lightFx != null && lightFx.thornwall != null ? lightFx.thornwall.intensity : 1.2f);
+                    lightFx != null && lightFx.thornwall != null ? lightFx.thornwall.intensity : 1.2f,
+                    AssetDatabase.LoadAssetAtPath<Material>(ThornBurnMaterialPath), banishSource,
+                    AssetDatabase.LoadAssetAtPath<AudioClip>(ThornBanishPath));
             }
         }
 
@@ -1027,6 +1130,14 @@ namespace TheFairyHills.Editor
                 interaction.blocker_h * 0.5f);
             VillageGate gate = root.AddComponent<VillageGate>();
             gate.Configure(gateRenderer, closedSprite, openSprite, blocker);
+            AudioSource creakSource = root.AddComponent<AudioSource>();
+            AudioSource latchSource = root.AddComponent<AudioSource>();
+            gate.ConfigureAudio(creakSource, latchSource, new[]
+            {
+                AssetDatabase.LoadAssetAtPath<AudioClip>(GateCreak1Path),
+                AssetDatabase.LoadAssetAtPath<AudioClip>(GateCreak2Path),
+                AssetDatabase.LoadAssetAtPath<AudioClip>(GateCreak3Path)
+            }, AssetDatabase.LoadAssetAtPath<AudioClip>(GateLatchPath));
 
             GameObject range = new GameObject("Gate Close Range");
             range.transform.SetParent(root.transform, false);
@@ -1048,7 +1159,8 @@ namespace TheFairyHills.Editor
             }
         }
 
-        private static void CreateIronCross(Chapter1InteractData interaction, Chapter1ForestLightFxData lightFx)
+        private static void CreateIronCross(Chapter1InteractData interaction, Chapter1ForestLightFxData lightFx,
+            AudioSource levelMusic)
         {
             string path = "Assets/_Project/Art/Backgrounds/S1b_ForestPath/props/F_prop_cross_v2.png";
             GameObject pickup = new GameObject("IronCrossPickup_FamilyHeirloom");
@@ -1061,12 +1173,10 @@ namespace TheFairyHills.Editor
             trigger.size = new Vector2(1.3f, 1.2f);
             trigger.offset = new Vector2(0f, 0.6f);
             int crossOrder = interaction.sorting_order == 0f ? 11 : Mathf.RoundToInt(interaction.sorting_order);
-            ParticleSystem stars = CreateSparkleHint(pickup.transform, "Iron Cross Hint Stars", 2.2f,
-                false, crossOrder);
-            ParticleSystem spinningStars = CreateSparkleHint(pickup.transform, "Iron Cross Slow Spin Stars", 1.1f,
-                true, crossOrder);
-            SpriteRenderer mainStar = CreateMainStar(pickup.transform, crossOrder);
-            SpriteRenderer starHalo = CreateStarHalo(pickup.transform, crossOrder);
+            ParticleSystem stars = CreateSparkleHint(pickup.transform, "Iron Cross Hint Stars", 0.6f, 30);
+            ParticleSystem spinningStars = CreateSparkleHint(pickup.transform, "Iron Cross Scattered Stars", 0.5f, 30);
+            SpriteRenderer mainStar = CreateMainStar(pickup.transform);
+            SpriteRenderer starHalo = CreateStarHalo(pickup.transform);
             Chapter1LightData lightSettings = lightFx != null ? lightFx.cross : null;
             Light2D crossLight = null;
             if (lightSettings != null)
@@ -1077,15 +1187,15 @@ namespace TheFairyHills.Editor
                 crossLight = ConfigurePointLight(lightObject, lightSettings, false);
             }
             pickup.AddComponent<IronCrossPickup>().Configure(cross, stars, spinningStars, mainStar, starHalo,
-                crossLight, lightSettings != null ? lightSettings.intensity : 0.8f, 2.5f, interaction.hint_trigger_x);
+                crossLight, lightSettings != null ? lightSettings.intensity : 0.8f, 2.5f, interaction.hint_trigger_x,
+                pickup.AddComponent<AudioSource>(), AssetDatabase.LoadAssetAtPath<AudioClip>(CrossPickupPath), levelMusic);
         }
 
-        private static ParticleSystem CreateSparkleHint(Transform parent, string objectName, float rate,
-            bool spinsSlowly, int sortingOrder)
+        private static ParticleSystem CreateSparkleHint(Transform parent, string objectName, float rate, int sortingOrder)
         {
             GameObject starsObject = new GameObject(objectName);
             starsObject.transform.SetParent(parent, false);
-            starsObject.transform.localPosition = new Vector3(0f, 0.25f, -0.15f);
+            starsObject.transform.localPosition = new Vector3(0f, 1.3f, -0.15f);
             ParticleSystem stars = starsObject.AddComponent<ParticleSystem>();
             ParticleSystem.MainModule main = stars.main;
             main.loop = true;
@@ -1093,14 +1203,14 @@ namespace TheFairyHills.Editor
             main.simulationSpace = ParticleSystemSimulationSpace.Local;
             main.startLifetime = 1.2f;
             main.startSpeed = 0f;
-            main.startSize = new ParticleSystem.MinMaxCurve(0.8f, 1.4f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.5f, 0.8f);
             main.startColor = Color.white;
-            main.maxParticles = 6;
+            main.maxParticles = 1;
             ParticleSystem.EmissionModule emission = stars.emission;
             emission.rateOverTime = rate;
             ParticleSystem.ShapeModule shape = stars.shape;
             shape.shapeType = ParticleSystemShapeType.Circle;
-            shape.radius = 1.5f;
+            shape.radius = 1f;
             shape.radiusThickness = 1f;
             ParticleSystem.ColorOverLifetimeModule color = stars.colorOverLifetime;
             color.enabled = true;
@@ -1110,12 +1220,6 @@ namespace TheFairyHills.Editor
             size.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(
                 new Keyframe(0f, 0f), new Keyframe(0.18f, 1f), new Keyframe(0.36f, 0.9f),
                 new Keyframe(0.56f, 1.05f), new Keyframe(0.76f, 0.9f), new Keyframe(1f, 0f)));
-            if (spinsSlowly)
-            {
-                ParticleSystem.RotationOverLifetimeModule rotation = stars.rotationOverLifetime;
-                rotation.enabled = true;
-                rotation.z = 3.927f;
-            }
             ParticleSystemRenderer renderer = stars.GetComponent<ParticleSystemRenderer>();
             renderer.renderMode = ParticleSystemRenderMode.Billboard;
             renderer.sortingOrder = sortingOrder;
@@ -1127,14 +1231,14 @@ namespace TheFairyHills.Editor
             return stars;
         }
 
-        private static SpriteRenderer CreateMainStar(Transform parent, int crossOrder)
+        private static SpriteRenderer CreateMainStar(Transform parent)
         {
             GameObject starObject = new GameObject("Iron Cross Main Star");
             starObject.transform.SetParent(parent, false);
-            starObject.transform.localPosition = new Vector3(0f, 0.55f, -0.15f);
+            starObject.transform.localPosition = new Vector3(0f, 1.3f, -0.15f);
             SpriteRenderer renderer = starObject.AddComponent<SpriteRenderer>();
             renderer.sprite = LoadSprite("Assets/_Project/Art/FX/FX_sparkle_star.png");
-            renderer.sortingOrder = crossOrder;
+            renderer.sortingOrder = 30;
             renderer.sharedMaterial = GetSparkleMaterial();
             renderer.color = Color.white;
             var properties = new MaterialPropertyBlock();
@@ -1147,14 +1251,14 @@ namespace TheFairyHills.Editor
             return renderer;
         }
 
-        private static SpriteRenderer CreateStarHalo(Transform parent, int sortingOrder)
+        private static SpriteRenderer CreateStarHalo(Transform parent)
         {
             GameObject haloObject = new GameObject("Iron Cross Star Halo");
             haloObject.transform.SetParent(parent, false);
-            haloObject.transform.localPosition = new Vector3(0f, 0.55f, -0.16f);
+            haloObject.transform.localPosition = new Vector3(0f, 1.3f, -0.16f);
             SpriteRenderer renderer = haloObject.AddComponent<SpriteRenderer>();
             renderer.sprite = LoadSprite("Assets/_Project/Art/FX/FX_soft_dot.png");
-            renderer.sortingOrder = sortingOrder;
+            renderer.sortingOrder = 30;
             renderer.sharedMaterial = GetSoftDotAdditiveMaterial(renderer.sprite.texture);
             renderer.color = Color.white;
             var properties = new MaterialPropertyBlock();

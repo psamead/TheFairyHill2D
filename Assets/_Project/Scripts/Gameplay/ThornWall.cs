@@ -8,6 +8,7 @@ namespace TheFairyHills.Gameplay
     public sealed class ThornWall : MonoBehaviour
     {
         private static readonly int GlowBaseColorId = Shader.PropertyToID("_BaseColor");
+        private static readonly int BurnId = Shader.PropertyToID("_Burn");
         private static readonly Color GlowTint = new Color(176f / 255f, 32f / 255f, 42f / 255f, 1f);
         [SerializeField] private SpriteRenderer wallRenderer;
         [SerializeField] private Collider2D blockingCollider;
@@ -20,7 +21,10 @@ namespace TheFairyHills.Gameplay
         [SerializeField] private float redLightIntensityMultiplier = 1.2f;
         [SerializeField] private Light2D exitLight;
         [SerializeField] private float exitLightTargetIntensity = 0.7f;
+        [SerializeField] private AudioSource sfxSource;
+        [SerializeField] private AudioClip banishClip;
         private MaterialPropertyBlock glowProperties;
+        private MaterialPropertyBlock burnProperties;
         private float currentGlowAlpha = 0.5f;
         private float nextFlashTime;
         private float flashEndTime;
@@ -35,7 +39,8 @@ namespace TheFairyHills.Gameplay
 
         public void Configure(SpriteRenderer renderer, Collider2D collider, ParticleSystem smokeEffect,
             SpriteRenderer glowEffect, Light2D pointLight, Light2D orangeFlashLight, ParticleSystem sparkEffect,
-            ParticleSystem glowSmokeEffect, float lightIntensityMultiplier = 1.2f)
+            ParticleSystem glowSmokeEffect, float lightIntensityMultiplier = 1.2f,
+            Material burnMaterial = null, AudioSource audioSource = null, AudioClip banishSfx = null)
         {
             wallRenderer = renderer;
             blockingCollider = collider;
@@ -46,6 +51,12 @@ namespace TheFairyHills.Gameplay
             sparks = sparkEffect;
             glowSmoke = glowSmokeEffect;
             redLightIntensityMultiplier = lightIntensityMultiplier;
+            sfxSource = audioSource;
+            banishClip = banishSfx;
+            if (wallRenderer != null && burnMaterial != null)
+                wallRenderer.sharedMaterial = burnMaterial;
+            burnProperties ??= new MaterialPropertyBlock();
+            SetBurn(0f);
             if (glowRenderer != null)
             {
                 glowRenderer.color = Color.white;
@@ -95,7 +106,6 @@ namespace TheFairyHills.Gameplay
         {
             float initialGlowAlpha = glowRenderer != null ? currentGlowAlpha : 0f;
             float initialLightIntensity = redLight != null ? redLight.intensity : 0f;
-            Color originalWallColor = wallRenderer != null ? wallRenderer.color : Color.white;
             const float glowDuration = 0.3f;
             float elapsed = 0f;
             while (elapsed < glowDuration)
@@ -109,39 +119,20 @@ namespace TheFairyHills.Gameplay
 
             SetGlow(0f);
             if (smoke != null) smoke.Play(true);
+            if (sfxSource != null && banishClip != null) sfxSource.PlayOneShot(banishClip);
             Coroutine flash = flashLight != null ? StartCoroutine(FadePulseLight()) : null;
 
-            Color burnColor = new Color32(255, 176, 112, 255);
-            const float burnInDuration = 0.2f;
+            const float dissolveDuration = 1.6f;
             elapsed = 0f;
-            while (elapsed < burnInDuration)
+            while (elapsed < dissolveDuration)
             {
                 elapsed += Time.deltaTime;
-                if (wallRenderer != null)
-                    wallRenderer.color = Color.Lerp(originalWallColor, burnColor, Mathf.Clamp01(elapsed / burnInDuration));
+                float progress = Mathf.Clamp01(elapsed / dissolveDuration);
+                SetBurn(1f - (1f - progress) * (1f - progress));
                 yield return null;
             }
-
-            const float fadeDuration = 0.6f;
-            elapsed = 0f;
-            while (elapsed < fadeDuration)
-            {
-                elapsed += Time.deltaTime;
-                if (wallRenderer != null)
-                {
-                    Color color = burnColor;
-                    color.a = 1f - Mathf.Clamp01(elapsed / fadeDuration);
-                    wallRenderer.color = color;
-                }
-                yield return null;
-            }
-
-            if (wallRenderer != null)
-            {
-                Color color = burnColor;
-                color.a = 0f;
-                wallRenderer.color = color;
-            }
+            SetBurn(1f);
+            if (wallRenderer != null) wallRenderer.enabled = false;
             if (blockingCollider != null) blockingCollider.enabled = false;
             if (flash != null) yield return flash;
             if (exitLight != null) StartCoroutine(FadeInExitLight());
@@ -205,6 +196,16 @@ namespace TheFairyHills.Gameplay
             glowRenderer.SetPropertyBlock(glowProperties);
             glowRenderer.color = Color.white;
             currentGlowAlpha = alpha;
+        }
+
+        private void SetBurn(float amount)
+        {
+            if (wallRenderer == null) return;
+            burnProperties ??= new MaterialPropertyBlock();
+            wallRenderer.GetPropertyBlock(burnProperties);
+            burnProperties.SetFloat(BurnId, amount);
+            wallRenderer.SetPropertyBlock(burnProperties);
+            wallRenderer.color = Color.white;
         }
     }
 }
