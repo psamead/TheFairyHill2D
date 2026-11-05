@@ -45,7 +45,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Burn: 0
+    - _Burn: -0.1
     - _CharWidth: 0.03
     - _EdgeWidth: 0.06
     - _EnableExternalAlpha: 0

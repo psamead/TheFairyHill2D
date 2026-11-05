@@ -52,7 +52,7 @@
   ],
   "blocks": [
     {
-      "x": 45.0,
+      "x": 43.9,
       "w": 6.72,
       "h": 3.0,
       "base": 0,
@@ -86,7 +86,7 @@
       "sprite": "props/F_prop_cross_v2.png",
       "reveal_radius": 2.5,
       "hint_fx": "FX/FX_sparkle_star.png",
-      "sorting_order": -4,
+      "sorting_order": -2,
       "hint_trigger_x": 44.6
     },
     {
@@ -210,7 +210,7 @@
     "cross": {
       "color": "#F2D28A",
       "intensity": 0.8,
-      "radius": 1.8,
+      "radius": 1.2,
       "inner_radius": 0.0,
       "falloff_intensity": 0.7
     },

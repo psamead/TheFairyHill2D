@@ -83,6 +83,7 @@ namespace TheFairyHills.Editor
         public float range_x0;
         public float range_x1;
         public float hint_trigger_x;
+        public float reveal_radius;
         public Chapter1RubbleData[] rubble;
     }
 
@@ -338,6 +339,24 @@ namespace TheFairyHills.Editor
             Debug.Log("Built Revision v3 Fix F: Village and Forest only. Core, MainMenu, HUD, and Build Settings were left unchanged.");
         }
 
+        [MenuItem("Tools/The Fairy Hills/Build Revision v3 Fix G - Forest Only")]
+        public static void BuildRevisionV3FixGForestOnly()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode before building Revision v3 Fix G.");
+
+            Scene activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.IsValid() && activeScene.isDirty)
+                throw new InvalidOperationException($"Save the dirty scene '{activeScene.path}' before building Revision v3 Fix G.");
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ConfigureThornBurnAssets();
+            Chapter1LayoutData forest = LoadLayout(ForestLayoutPath);
+            BuildScene(forest, ForestScenePath, true);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Built Revision v3 Fix G: Forest only. Core, Village, MainMenu, HUD, and Build Settings were left unchanged.");
+        }
+
         private static void ConfigureFixFAudioImports()
         {
             string[] paths =
@@ -379,6 +398,7 @@ namespace TheFairyHills.Editor
             }
             else material.shader = shader;
             material.SetTexture("_BurnMask", AssetDatabase.LoadAssetAtPath<Texture2D>(ThornBurnMaskPath));
+            material.SetFloat("_Burn", -0.1f);
             material.SetFloat("_EdgeWidth", 0.06f);
             material.SetFloat("_CharWidth", 0.03f);
             material.SetColor("_EdgeColor", new Color(2f, 2f * 154f / 255f, 2f * 60f / 255f, 1f));
@@ -392,7 +412,7 @@ namespace TheFairyHills.Editor
             AudioSource source = musicObject.AddComponent<AudioSource>();
             source.clip = AssetDatabase.LoadAssetAtPath<AudioClip>(forest ? ForestMusicPath : VillageMusicPath);
             if (source.clip == null) throw new InvalidOperationException("Chapter level music clip is missing.");
-            source.playOnAwake = true;
+            source.playOnAwake = false;
             source.loop = true;
             source.volume = 0.5f;
             source.spatialBlend = 0f;
@@ -1176,19 +1196,21 @@ namespace TheFairyHills.Editor
             ParticleSystem stars = CreateSparkleHint(pickup.transform, "Iron Cross Hint Stars", 0.6f, 30);
             ParticleSystem spinningStars = CreateSparkleHint(pickup.transform, "Iron Cross Scattered Stars", 0.5f, 30);
             SpriteRenderer mainStar = CreateMainStar(pickup.transform);
-            SpriteRenderer starHalo = CreateStarHalo(pickup.transform);
+            SpriteRenderer starHalo = CreateStarHalo(pickup.transform, mainStar.transform.localPosition);
             Chapter1LightData lightSettings = lightFx != null ? lightFx.cross : null;
             Light2D crossLight = null;
             if (lightSettings != null)
             {
                 GameObject lightObject = new GameObject("Iron Cross Warm Point Light");
                 lightObject.transform.SetParent(pickup.transform, false);
-                lightObject.transform.position = cross.bounds.center;
+                lightObject.transform.position = mainStar.transform.position;
                 crossLight = ConfigurePointLight(lightObject, lightSettings, false);
             }
             pickup.AddComponent<IronCrossPickup>().Configure(cross, stars, spinningStars, mainStar, starHalo,
-                crossLight, lightSettings != null ? lightSettings.intensity : 0.8f, 2.5f, interaction.hint_trigger_x,
+                crossLight, lightSettings != null ? lightSettings.intensity : 0.8f,
+                interaction.reveal_radius > 0f ? interaction.reveal_radius : 2.5f, interaction.hint_trigger_x,
                 pickup.AddComponent<AudioSource>(), AssetDatabase.LoadAssetAtPath<AudioClip>(CrossPickupPath), levelMusic);
+            cross.sortingOrder = interaction.sorting_order == 0f ? -2 : Mathf.RoundToInt(interaction.sorting_order);
         }
 
         private static ParticleSystem CreateSparkleHint(Transform parent, string objectName, float rate, int sortingOrder)
@@ -1251,11 +1273,11 @@ namespace TheFairyHills.Editor
             return renderer;
         }
 
-        private static SpriteRenderer CreateStarHalo(Transform parent)
+        private static SpriteRenderer CreateStarHalo(Transform parent, Vector3 centerPosition)
         {
             GameObject haloObject = new GameObject("Iron Cross Star Halo");
             haloObject.transform.SetParent(parent, false);
-            haloObject.transform.localPosition = new Vector3(0f, 1.3f, -0.16f);
+            haloObject.transform.localPosition = centerPosition;
             SpriteRenderer renderer = haloObject.AddComponent<SpriteRenderer>();
             renderer.sprite = LoadSprite("Assets/_Project/Art/FX/FX_soft_dot.png");
             renderer.sortingOrder = 30;
@@ -1266,7 +1288,7 @@ namespace TheFairyHills.Editor
             properties.SetColor(Shader.PropertyToID("_BaseColor"), new Color(242f / 255f, 210f / 255f, 138f / 255f, 0.35f));
             renderer.SetPropertyBlock(properties);
             Vector2 size = renderer.sprite.bounds.size;
-            haloObject.transform.localScale = new Vector3(2.5f / size.x, 2.5f / size.y, 1f);
+            haloObject.transform.localScale = new Vector3(1.2f / size.x, 1.2f / size.y, 1f);
             haloObject.SetActive(false);
             return renderer;
         }

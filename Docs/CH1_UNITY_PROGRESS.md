@@ -194,3 +194,12 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 
 - Synced the manually adjusted Forest positions from the Unity Inspector: `BrambleCluster_Decorative` root `(45, 0, 0)` and `IronCrossPickup_FamilyHeirloom` root `(48.5, 0.03, 0)`. The cross sprite remains at local `(-0.6, 0, 0)`; the main star and hint/star effects remain at local `(0, 1.3, -0.15)` and the halo at `(0, 1.3, -0.16)`, so the parent move carries the group together.
 - Updated the Forest layout block/pickup X values to `45.0` and `48.5`. The builder already reads those values; adjusted the pickup root depth to `Z=0` to match the saved Inspector transform. Saved the active Forest scene in Unity, outside Play Mode, after confirming the edited pickup transform. No scene rebuild or Play Mode test was run.
+
+## Revision v3 Fix G — 2026-11-05
+
+- G1: Thorn-wall burn begins at `_Burn=-0.1`, eases to `1.0` over 1.6 seconds, and scales the edge colour by `saturate(_Burn * 20)` so there is no gold edge before IronPulse.
+- G2: Reduced the cross star halo to 1.2u, centred on the main star, and set the warm Point Light radius to 1.2u at the star position.
+- G3: Cross reveal now checks Niamh against the cross sprite bounds centre, reveals inside 2.5u with a 0.4-second fade, and logs once. It does not depend on shamrock or star state. Cross Visual sorts at -2; the decorative bramble remains behind it at -3. The latest saved Unity transform is bramble root x=43.9 and pickup root x=48.5, replacing the earlier x=45 bramble capture.
+- G4: Level music no longer starts on Awake. `LevelBootstrap` waits for Core when Forest is opened directly, verifies/enables Core's single AudioListener, and then starts the level music. Core's serialized listener was already enabled, so Core was not rebuilt.
+- Rebuilt and saved Forest only; MainMenu, Village, Core, HUD, and Build Settings were not rebuilt or changed for this round. Unity compilation, shader support, serialized scene settings, and scene structure were inspected. No automated tests or Play Mode/audio playback checks were run. Edit-mode listener warnings with Forest open alone are expected.
+- Please check: no pre-Q gold burn edge; 1.2u halo and light aligned to the main star; the cross fades in within 2.5u regardless of shamrock state and is visible in front of the bramble; direct Forest Play has no missing-listener warning.

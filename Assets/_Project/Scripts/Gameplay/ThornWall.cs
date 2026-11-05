@@ -56,7 +56,7 @@ namespace TheFairyHills.Gameplay
             if (wallRenderer != null && burnMaterial != null)
                 wallRenderer.sharedMaterial = burnMaterial;
             burnProperties ??= new MaterialPropertyBlock();
-            SetBurn(0f);
+            SetBurn(-0.1f);
             if (glowRenderer != null)
             {
                 glowRenderer.color = Color.white;
@@ -128,7 +128,8 @@ namespace TheFairyHills.Gameplay
             {
                 elapsed += Time.deltaTime;
                 float progress = Mathf.Clamp01(elapsed / dissolveDuration);
-                SetBurn(1f - (1f - progress) * (1f - progress));
+                float easeOut = 1f - (1f - progress) * (1f - progress);
+                SetBurn(Mathf.Lerp(-0.1f, 1f, easeOut));
                 yield return null;
             }
             SetBurn(1f);

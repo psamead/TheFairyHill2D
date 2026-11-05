@@ -22,6 +22,7 @@ namespace TheFairyHills.Gameplay
         [SerializeField] private AudioSource levelMusicSource;
         private PlayerController2D player;
         private bool revealed;
+        private bool revealComplete;
         private bool collected;
         private bool hintStarted;
         private Vector3 mainStarScale;
@@ -141,20 +142,44 @@ namespace TheFairyHills.Gameplay
 
             if (hintStarted) UpdateMainStar();
 
-            if (player == null || revealed || Vector2.Distance(player.transform.position, transform.position) > revealRadius) return;
+            if (player == null || revealed) return;
+            Vector2 crossCenter = crossRenderer != null ? (Vector2)crossRenderer.bounds.center : (Vector2)transform.position;
+            float distanceToCross = Vector2.Distance(player.transform.position, crossCenter);
+            if (distanceToCross >= revealRadius) return;
 
             revealed = true;
-            if (crossRenderer != null)
-            {
-                Color color = crossRenderer.color;
-                color.a = 1f;
-                crossRenderer.color = color;
-            }
+            Debug.Log($"Iron Cross revealed at {crossCenter} (distance {distanceToCross:0.00}).", this);
+            StartCoroutine(FadeCrossIn());
             if (hintStars != null)
             {
                 ParticleSystem.EmissionModule emission = hintStars.emission;
                 emission.rateOverTime = new ParticleSystem.MinMaxCurve(0.5f, 0.75f);
             }
+        }
+
+        private System.Collections.IEnumerator FadeCrossIn()
+        {
+            if (crossRenderer == null)
+            {
+                revealComplete = true;
+                yield break;
+            }
+
+            Color color = crossRenderer.color;
+            color.a = 0f;
+            crossRenderer.color = color;
+            const float duration = 0.4f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                color.a = Mathf.Clamp01(elapsed / duration);
+                crossRenderer.color = color;
+                yield return null;
+            }
+            color.a = 1f;
+            crossRenderer.color = color;
+            revealComplete = true;
         }
 
         private void UpdateMainStar()
@@ -194,7 +219,17 @@ namespace TheFairyHills.Gameplay
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (collected) return;
+            TryCollect(other);
+        }
+
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            TryCollect(other);
+        }
+
+        private void TryCollect(Collider2D other)
+        {
+            if (collected || !revealComplete) return;
             PlayerController2D enteringPlayer = other.GetComponentInParent<PlayerController2D>();
             if (enteringPlayer == null) return;
             collected = true;

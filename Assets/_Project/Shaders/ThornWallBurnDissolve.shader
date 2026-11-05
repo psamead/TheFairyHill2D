@@ -11,7 +11,7 @@ Shader "TheFairyHills/Thorn Wall Burn Dissolve"
         [HideInInspector] _AlphaTex ("External Alpha", 2D) = "white" {}
         [HideInInspector] _EnableExternalAlpha ("Enable External Alpha", Float) = 0
         [MaterialToggle] _ZWrite ("ZWrite", Float) = 0
-        _Burn ("Burn", Range(0,1)) = 0
+        _Burn ("Burn", Range(-0.1,1)) = -0.1
         _EdgeWidth ("Fire Edge Width", Range(0.001,0.2)) = 0.06
         _CharWidth ("Char Width", Range(0,0.2)) = 0.03
         [HDR] _EdgeColor ("Fire Edge (Unlit)", Color) = (1,0.353,0.048,1)
@@ -78,7 +78,7 @@ Shader "TheFairyHills/Thorn Wall Burn Dissolve"
 
                 half4 lit = CommonLitFragment(input, input.color);
                 if (mask < _Burn + _EdgeWidth)
-                    return half4(_EdgeColor.rgb, lit.a);
+                    return half4(_EdgeColor.rgb * saturate(_Burn * 20), lit.a);
 
                 if (_CharWidth > 0 && mask < _Burn + _EdgeWidth + _CharWidth)
                     return half4(_CharColor.rgb, lit.a);
@@ -192,7 +192,7 @@ Shader "TheFairyHills/Thorn Wall Burn Dissolve"
                 half4 sprite = CommonUnlitFragment(input, input.color);
                 float mask = SAMPLE_TEXTURE2D(_BurnMask, sampler_BurnMask, input.uv).r;
                 clip(mask - _Burn);
-                if (mask < _Burn + _EdgeWidth) return half4(_EdgeColor.rgb, sprite.a);
+                if (mask < _Burn + _EdgeWidth) return half4(_EdgeColor.rgb * saturate(_Burn * 20), sprite.a);
                 if (_CharWidth > 0 && mask < _Burn + _EdgeWidth + _CharWidth)
                     return half4(_CharColor.rgb, sprite.a);
                 return sprite;
