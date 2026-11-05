@@ -1164,7 +1164,7 @@ namespace TheFairyHills.Editor
         {
             string path = "Assets/_Project/Art/Backgrounds/S1b_ForestPath/props/F_prop_cross_v2.png";
             GameObject pickup = new GameObject("IronCrossPickup_FamilyHeirloom");
-            pickup.transform.position = new Vector3(interaction.x, interaction.y + 0.03f, -0.1f);
+            pickup.transform.position = new Vector3(interaction.x, interaction.y + 0.03f, 0f);
             SpriteRenderer cross = CreateScaledSprite(pickup.transform, LoadSprite(path), 1.2f, 1f,
                 interaction.sorting_order == 0f ? 11 : Mathf.RoundToInt(interaction.sorting_order));
             cross.transform.localPosition = new Vector3(-0.6f, 0f, 0f);
