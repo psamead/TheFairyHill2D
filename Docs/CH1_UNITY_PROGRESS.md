@@ -239,3 +239,9 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 - Added menu → three story beats → Chapter I → original Village/Core flow, separate configurable scene/data and existing Fondamento font/music. The unchanged OP01 placeholder is reused for all three captions; not final art. Standalone Village/Forest debug skips it.
 - Unity compiled; actual-project normal playback, menu replay and guarded double Play/Skip callbacks observed. One listener and no input-lock/overlay remain in Village. Full 1080p page/card/destination screenshots plus a live UI camera render at 720p are in `Docs/References/Opening_Chapter1_Placeholder_v1/Unity_Trial/`.
 - No level/Core rebuild or saved Village/Forest change. Own static opening font atlas avoids sharing the editable gameplay font. New opening owner acceptance and remaining keyboard/held-input/third-page Skip review are pending. Full evidence boundaries and rollback: `Docs/Opening_Chapter1_Placeholder_Unity_Handoff.md`.
+
+## Niamh surface audio v1 trial — 2026-11-14
+
+- Verified/imported 23 staged OGGs, added opt-out Core audio component, explicit surface JSON/profile and runtime collider metadata. No level rebuild/save or v8 curve/collision change. Ground collider comes from the controller's existing cast; jump cue uses its successful-jump event.
+- Actual Editor observations with identified injected keyboard input: 0.40 s walk dirt steps, 0.25 s run stone steps, grass/hay steps, one jump/light landing, staged heavy landing, limited hay brush. Pause and disable stopped motion sources. Forest's five mappings and one listener confirmed; opening handoff started with zero movement cues.
+- Full mix defaults, material ranges, staging boundaries, compiler correction and owner listening still pending: `Docs/Niamh_Surface_Audio_Unity_Handoff.md` (versioned task alias also provided). Counter/playback evidence does not prove audible quality. Existing BGM/gate/pickup/thorn systems retained.

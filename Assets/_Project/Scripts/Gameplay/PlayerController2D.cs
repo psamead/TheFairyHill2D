@@ -40,6 +40,9 @@ namespace TheFairyHills.Gameplay
         public bool HasIronCross => GameState.Instance != null ? GameState.Instance.HasIronCross : hasIronCrossFallback;
         public Rigidbody2D Body => body;
         public bool IsGrounded { get; private set; }
+        public Collider2D GroundCollider { get; private set; }
+        public Vector2 GroundPoint { get; private set; }
+        public event System.Action Jumped;
         public bool FacingLeft => playerVisual != null && playerVisual.flipX;
         public float WalkSpeed => walkSpeed;
         public float RunSpeed => runSpeed;
@@ -137,6 +140,7 @@ namespace TheFairyHills.Gameplay
                 jumpBufferTimer = 0f;
                 coyoteTimer = 0f;
                 grounded = false;
+                Jumped?.Invoke();
             }
 
             if (jumpCutQueued && velocity.y > 0f)
@@ -164,15 +168,17 @@ namespace TheFairyHills.Gameplay
 
         private bool CheckGrounded()
         {
+            GroundCollider = null;
             if (capsule == null) return false;
             int count = capsule.Cast(Vector2.down, groundFilter, groundHitBuffer, groundCastDistance);
+            float nearest = float.PositiveInfinity;
             for (int i = 0; i < count; i++)
             {
                 RaycastHit2D hit = groundHitBuffer[i];
-                if (hit.collider != null && hit.normal.y > 0.5f)
-                    return true;
+                if (hit.collider != null && hit.normal.y > 0.5f && hit.distance < nearest)
+                { GroundCollider = hit.collider; GroundPoint = hit.point; nearest = hit.distance; }
             }
-            return false;
+            return GroundCollider != null;
         }
 
         private void RefreshInteractionPrompt()

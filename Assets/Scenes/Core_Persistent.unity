@@ -1514,6 +1514,7 @@ GameObject:
   - component: {fileID: 1180013429}
   - component: {fileID: 1180013428}
   - component: {fileID: 1180013427}
+  - component: {fileID: 1180013430}
   m_Layer: 0
   m_Name: Niamh
   m_TagString: Untagged
@@ -1631,6 +1632,25 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
+--- !u!114 &1180013430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180013425}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69134f8b0c8030c45b76fe2f2f651047, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheFairyHills.Gameplay.NiamhSurfaceAudio
+  profile: {fileID: 11400000, guid: f6f52ebd1b4546449a4f73bdb47e49e7, type: 2}
+  walkVolume: 0.34
+  runVolume: 0.43
+  jumpVolume: 0.36
+  lightLandVolume: 0.4
+  heavyLandVolume: 0.52
+  brushVolume: 0.2
 --- !u!1 &1190102778
 GameObject:
   m_ObjectHideFlags: 0

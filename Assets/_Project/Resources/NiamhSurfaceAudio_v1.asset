@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86b03a9385779d747b685b2e456a3135, type: 3}
+  m_Name: NiamhSurfaceAudio_v1
+  m_EditorClassIdentifier: Assembly-CSharp::TheFairyHills.Gameplay.SurfaceAudioProfile
+  steps:
+  - surface: 0
+    clips:
+    - {fileID: 8300000, guid: 2d966ffa0d8aee6429dc0eb59f118b83, type: 3}
+    - {fileID: 8300000, guid: a392f258698093540889e83b7e53899f, type: 3}
+    - {fileID: 8300000, guid: 423359dce9a167e47b372877d397e632, type: 3}
+  - surface: 1
+    clips:
+    - {fileID: 8300000, guid: f85a1294399c9234eb1b21a8fef4dac4, type: 3}
+    - {fileID: 8300000, guid: b0f8590446be4d5499d881cfe6fcb12a, type: 3}
+    - {fileID: 8300000, guid: 5ce6173f3dd939f4fbfd118461bd3f49, type: 3}
+  - surface: 2
+    clips:
+    - {fileID: 8300000, guid: f6d654b76b703af43b5d3e9354d51899, type: 3}
+    - {fileID: 8300000, guid: d97cae3a228dbdf4da8a0e9ec1a59b61, type: 3}
+    - {fileID: 8300000, guid: 69476ef35814c9d4c9317634249b9100, type: 3}
+  - surface: 3
+    clips:
+    - {fileID: 8300000, guid: 4d07ffd9170510943b7c75f840d8cce2, type: 3}
+    - {fileID: 8300000, guid: 166d6e8c90824364e8668278df4fa8ec, type: 3}
+    - {fileID: 8300000, guid: 8f18e8ee5b005814e95aa96c8f36d494, type: 3}
+  - surface: 4
+    clips:
+    - {fileID: 8300000, guid: ed0335d5d855dbb41bd21b36ec1b3082, type: 3}
+    - {fileID: 8300000, guid: eb1762585698b8c48ab92c63c646f8c5, type: 3}
+    - {fileID: 8300000, guid: c72aaf71409c93c4aaad042aea2a8412, type: 3}
+  jump:
+  - {fileID: 8300000, guid: dd15b90aed644394c985229d968b7b06, type: 3}
+  - {fileID: 8300000, guid: 1b5e0d6ef44d319438718bef3951478f, type: 3}
+  lightLand:
+  - {fileID: 8300000, guid: 7c5cdbe52f5ef4f43829f32667256568, type: 3}
+  - {fileID: 8300000, guid: 5e27c9901c90ceb46b8dacb39a938eaa, type: 3}
+  heavyLand:
+  - {fileID: 8300000, guid: 536c7eb0af327454eaac8df0f79d7282, type: 3}
+  - {fileID: 8300000, guid: 679249d3e6243c342aa7de0e12162ce3, type: 3}
+  hayBrush:
+  - {fileID: 8300000, guid: 6e6d6e5ea217eb2408e8cb78a5b25ae2, type: 3}
+  - {fileID: 8300000, guid: 79ea635d07495644d96c8c7cddf975c2, type: 3}
+  mappings:
+  - scene: Ch1_S1_Village
+    path: Graybox Ground/Ground_0.0_to_38.4
+    description: 'Trial authored road: dirt, grass from x 0-2.5 and 30-34. Material
+      IDs: dirt0 grass1 stone2 hay3 wood4.'
+    surface: 0
+    brush: 0
+    regions:
+    - from: 0
+      to: 2.5
+      surface: 1
+    - from: 30
+      to: 34
+      surface: 1
+  - scene: Ch1_S1_Village
+    path: StoneWall_Low_1.2u
+    description: Existing low stone wall collider
+    surface: 2
+    brush: 0
+    regions: []
+  - scene: Ch1_S1_Village
+    path: StoneWall_Tall_1.8u
+    description: Existing manually tuned tall stone wall collider
+    surface: 2
+    brush: 0
+    regions: []
+  - scene: Ch1_S1_Village
+    path: HayBale_0.9u
+    description: Existing solid hay collider; proximity adds brush, no new trigger
+      or geometry
+    surface: 3
+    brush: 1
+    regions: []
+  - scene: Ch1_S1b_ForestPath
+    path: Graybox Ground/Ground_0.0_to_30.0
+    description: Trial authored grass path with dirt stretches x 8-14 and 24-29
+    surface: 1
+    brush: 0
+    regions:
+    - from: 8
+      to: 14
+      surface: 0
+    - from: 24
+      to: 29
+      surface: 0
+  - scene: Ch1_S1b_ForestPath
+    path: Graybox Ground/Ground_31.4_to_42.0
+    description: Grass segment
+    surface: 1
+    brush: 0
+    regions: []
+  - scene: Ch1_S1b_ForestPath
+    path: Graybox Ground/Ground_44.6_to_60.0
+    description: Grass segment with dirt stretch x 48-52
+    surface: 1
+    brush: 0
+    regions:
+    - from: 48
+      to: 52
+      surface: 0
+  - scene: Ch1_S1b_ForestPath
+    path: PitFloor_SmallGap_1.4u_WalkJump
+    description: Existing small-pit dirt floor
+    surface: 0
+    brush: 0
+    regions: []
+  - scene: Ch1_S1b_ForestPath
+    path: PitFloor_LargeGap_2.6u_RunJump
+    description: Existing large-pit dirt floor
+    surface: 0
+    brush: 0
+    regions: []

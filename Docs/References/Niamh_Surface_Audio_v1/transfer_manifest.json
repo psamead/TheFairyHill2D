@@ -1,0 +1,145 @@
+{
+  "date": "2026-11-14",
+  "status": "Owner approved in-game trial; files copied and hashes verified; integration and in-game listening pending",
+  "channel": "Shared local network",
+  "files": [
+    {
+      "file": "SFX_Niamh_HayBrush_01_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_HayBrush_01_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_HayBrush_01_v1.ogg",
+      "sha256": "CBFEC8896DB2532B26B4F898339558DD47E60CC51EB5C4404B96828FDA0EF091"
+    },
+    {
+      "file": "SFX_Niamh_HayBrush_02_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_HayBrush_02_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_HayBrush_02_v1.ogg",
+      "sha256": "AFCE05E540564447A2A91087049D6166AD45ACBFC216B4618E6F177C9DC2F24D"
+    },
+    {
+      "file": "SFX_Niamh_Jump_01_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Jump_01_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Jump_01_v1.ogg",
+      "sha256": "1D55C364308283CF16D2D08EF6F1164C0B1B7A49AA5EC96A697686198E707E01"
+    },
+    {
+      "file": "SFX_Niamh_Jump_02_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Jump_02_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Jump_02_v1.ogg",
+      "sha256": "35F58124EAA945C267B2FD787883F134812EFE312E42A8825B794C5BA2350C75"
+    },
+    {
+      "file": "SFX_Niamh_Land_heavy_01_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Land_heavy_01_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Land_heavy_01_v1.ogg",
+      "sha256": "AB092114209F667D5A8C3ACA049A639B1C4CB13F11586EAF9B9E5574F880E393"
+    },
+    {
+      "file": "SFX_Niamh_Land_heavy_02_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Land_heavy_02_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Land_heavy_02_v1.ogg",
+      "sha256": "388B7EABA68ACC99BD542E6C289E46CE685DA5F9950345C80FB146F766D654FF"
+    },
+    {
+      "file": "SFX_Niamh_Land_light_01_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Land_light_01_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Land_light_01_v1.ogg",
+      "sha256": "A3E5DD28276735E67EC5B334AADA9D416DA46A9D96C2001A6B320D274DCD97E5"
+    },
+    {
+      "file": "SFX_Niamh_Land_light_02_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Land_light_02_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Land_light_02_v1.ogg",
+      "sha256": "C7AF3A3C1F18A698BACB820FDFE6D35F7478C95B0B4E93D03EAB3859BA2FEE29"
+    },
+    {
+      "file": "SFX_Niamh_Step_dirt_01_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_dirt_01_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_dirt_01_v1.ogg",
+      "sha256": "5818B6C91AC5BDA1A97B0AC3B02326117A6770F634E3F29337E89A7A57A0FBB0"
+    },
+    {
+      "file": "SFX_Niamh_Step_dirt_02_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_dirt_02_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_dirt_02_v1.ogg",
+      "sha256": "89EC0E664303B92754DC5C6A231F4F3924F013EF164BB628F5CF94D589A26603"
+    },
+    {
+      "file": "SFX_Niamh_Step_dirt_03_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_dirt_03_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_dirt_03_v1.ogg",
+      "sha256": "ACC0ACFD3822F42590BCE98E6B82E1613111111E3B6DBFE62D2796929F17D893"
+    },
+    {
+      "file": "SFX_Niamh_Step_grass_01_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_grass_01_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_grass_01_v1.ogg",
+      "sha256": "EAD1FCD2271722A02B842CE42A86B943F7098879234528D225AC308FA77E764C"
+    },
+    {
+      "file": "SFX_Niamh_Step_grass_02_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_grass_02_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_grass_02_v1.ogg",
+      "sha256": "5B4F52BCF63BE2DD6DE401A7625864114D029E89ABC5DB98D750365D364C1441"
+    },
+    {
+      "file": "SFX_Niamh_Step_grass_03_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_grass_03_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_grass_03_v1.ogg",
+      "sha256": "3585CCD11D700BBFDAEBF0FA2E5EE37AE42F180F430801B27172E194A59C8A0D"
+    },
+    {
+      "file": "SFX_Niamh_Step_hay_01_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_hay_01_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_hay_01_v1.ogg",
+      "sha256": "9F67B339BEA64C91A943CCE480A76D5BE42D71CB8B88A4D15B90FE5C4EAD082F"
+    },
+    {
+      "file": "SFX_Niamh_Step_hay_02_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_hay_02_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_hay_02_v1.ogg",
+      "sha256": "7950216375F4A00760052F9E574E24AF7C26C826C1AE32397B0FBD9CA2F0CDC7"
+    },
+    {
+      "file": "SFX_Niamh_Step_hay_03_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_hay_03_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_hay_03_v1.ogg",
+      "sha256": "FF34DB03F605519414FB52F08DD628B280BC610ECA25EBE7A913CC3ABFC61A04"
+    },
+    {
+      "file": "SFX_Niamh_Step_stone_01_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_stone_01_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_stone_01_v1.ogg",
+      "sha256": "7D4D7351F5CF7D2F82BE1338888B7DB5B4A7C3B23008A90ED2702819DFCEED3D"
+    },
+    {
+      "file": "SFX_Niamh_Step_stone_02_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_stone_02_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_stone_02_v1.ogg",
+      "sha256": "5D03A8DA6DD2625BA529158C46A388E0CA223A9F2670C65B9630C4F10E345E53"
+    },
+    {
+      "file": "SFX_Niamh_Step_stone_03_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_stone_03_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_stone_03_v1.ogg",
+      "sha256": "4F0BD52058AF980EBC99684F08C8C033C267041276EE86BAF20751952C50ED2C"
+    },
+    {
+      "file": "SFX_Niamh_Step_wood_01_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_wood_01_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_wood_01_v1.ogg",
+      "sha256": "3B7BBA53310F4A6C93EF4369F54537261CEF3E2951FA36345ADF89D584A64C98"
+    },
+    {
+      "file": "SFX_Niamh_Step_wood_02_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_wood_02_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_wood_02_v1.ogg",
+      "sha256": "2EE7C426D3E47519D8F10BCA6A2828E8F5C9DA7FDB03E9B58D7D19C58FD38DE8"
+    },
+    {
+      "file": "SFX_Niamh_Step_wood_03_v1.ogg",
+      "source": "TechArtAsset/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_wood_03_v1.ogg",
+      "target": "Assets/_Project/Audio/SFX/Niamh_Motion_v1/SFX_Niamh_Step_wood_03_v1.ogg",
+      "sha256": "AD9C1E83F4A132C67EE3649AE2E89F7335C509746E80D10AB78A88C2E190B0A5"
+    }
+  ]
+}

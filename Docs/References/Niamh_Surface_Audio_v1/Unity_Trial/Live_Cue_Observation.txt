@@ -1,0 +1,46 @@
+Actual Editor observation, no automated test suite. Any injected keyboard state is identified separately.
+Mapping Ch1_S1_Village/HayBale_0.9u material=Hay collider=Center: (14.84, 0.42, 0.00), Extents: (0.69, 0.42, 0.00) brush=True
+Mapping Ch1_S1_Village/StoneWall_Tall_1.8u material=Stone collider=Center: (18.84, 0.90, 0.00), Extents: (1.60, 0.90, 0.00) brush=False
+Mapping Ch1_S1_Village/StoneWall_Low_1.2u material=Stone collider=Center: (10.90, 0.60, 0.00), Extents: (1.40, 0.60, 0.00) brush=False
+Mapping Ch1_S1_Village/Ground_0.0_to_38.4 material=Dirt collider=Center: (19.20, -0.50, 0.00), Extents: (19.20, 0.50, 0.00) brush=False
+Core_Persistent t=12.359 pos=(3.50, 0.00) velocity=(0.00, 0.00) grounded=True counts=0/0/0/0 cue=
+COMMAND INPUT: hold D on the real player; normal Update/FixedUpdate owns movement.
+Core_Persistent t=17.923 pos=(4.20, 0.00) velocity=(3.20, 0.00) grounded=True counts=1/0/0/0 cue=Step Dirt SFX_Niamh_Step_dirt_03_v1
+Core_Persistent t=18.324 pos=(5.48, 0.00) velocity=(3.20, 0.00) grounded=True counts=2/0/0/0 cue=Step Dirt SFX_Niamh_Step_dirt_02_v1
+Core_Persistent t=18.724 pos=(6.76, 0.00) velocity=(3.20, 0.00) grounded=True counts=3/0/0/0 cue=Step Dirt SFX_Niamh_Step_dirt_01_v1
+Core_Persistent t=19.124 pos=(8.04, 0.00) velocity=(3.20, 0.00) grounded=True counts=4/0/0/0 cue=Step Dirt SFX_Niamh_Step_dirt_02_v1
+Core_Persistent t=23.321 pos=(9.30, 0.21) velocity=(0.00, 10.12) grounded=False counts=4/1/0/0 cue=Jump Dirt SFX_Niamh_Jump_01_v1
+Core_Persistent t=30.182 pos=(9.30, 0.01) velocity=(0.00, 0.00) grounded=True counts=4/1/1/0 cue=Land light Dirt SFX_Niamh_Land_light_02_v1
+COMMAND STAGING: place on existing low stone wall, then Shift+D. This checks sound selection, not natural jump clearance.
+Core_Persistent t=60.686 pos=(10.98, 1.22) velocity=(5.60, 0.00) grounded=True counts=5/1/1/0 cue=Step Stone SFX_Niamh_Step_stone_03_v1
+Core_Persistent t=60.937 pos=(12.33, 1.22) velocity=(5.60, 0.00) grounded=True counts=6/1/1/0 cue=Step Stone SFX_Niamh_Step_stone_02_v1
+Core_Persistent t=61.183 pos=(13.71, 0.00) velocity=(5.60, 0.00) grounded=True counts=6/1/2/0 cue=Land light Dirt SFX_Niamh_Land_light_01_v1
+Core_Persistent t=61.201 pos=(13.83, 0.00) velocity=(5.60, 0.00) grounded=True counts=6/1/2/1 cue=HayBrush SFX_Niamh_HayBrush_02_v1
+COMMAND STAGING: place on existing solid hay top, D input. Existing collider unchanged.
+Core_Persistent t=66.546 pos=(15.60, 0.86) velocity=(5.60, 0.00) grounded=True counts=6/1/2/2 cue=HayBrush SFX_Niamh_HayBrush_01_v1
+Core_Persistent t=66.761 pos=(16.26, 0.00) velocity=(3.20, 0.00) grounded=True counts=6/1/3/2 cue=Land light Dirt SFX_Niamh_Land_light_02_v1
+COMMAND STAGING: grass-region x0.5, then D. Authored grass interval from JSON, not inferred from art.
+Core_Persistent t=76.885 pos=(1.52, 0.02) velocity=(3.20, 0.00) grounded=True counts=7/1/3/2 cue=Step Grass SFX_Niamh_Step_grass_01_v1
+Core_Persistent t=77.286 pos=(2.80, 0.02) velocity=(3.20, 0.00) grounded=True counts=8/1/3/2 cue=Step Dirt SFX_Niamh_Step_dirt_03_v1
+Core_Persistent t=77.685 pos=(4.08, 0.02) velocity=(3.20, 0.00) grounded=True counts=9/1/3/2 cue=Step Dirt SFX_Niamh_Step_dirt_02_v1
+Core_Persistent t=78.086 pos=(5.36, 0.02) velocity=(3.20, 0.00) grounded=True counts=10/1/3/2 cue=Step Dirt SFX_Niamh_Step_dirt_01_v1
+Core_Persistent t=78.486 pos=(6.64, 0.02) velocity=(3.20, 0.00) grounded=True counts=11/1/3/2 cue=Step Dirt SFX_Niamh_Step_dirt_02_v1
+Core_Persistent t=78.888 pos=(7.92, 0.02) velocity=(3.20, 0.00) grounded=True counts=12/1/3/2 cue=Step Dirt SFX_Niamh_Step_dirt_03_v1
+Core_Persistent t=79.286 pos=(9.20, 0.02) velocity=(3.20, 0.00) grounded=True counts=13/1/3/2 cue=Step Dirt SFX_Niamh_Step_dirt_02_v1
+COMMAND STAGING: stop on hay before a walk, reset locomotion transition.
+Core_Persistent t=97.379 pos=(14.68, 0.86) velocity=(3.20, 0.00) grounded=True counts=13/1/3/3 cue=HayBrush SFX_Niamh_HayBrush_02_v1
+Core_Persistent t=102.221 pos=(14.75, 0.86) velocity=(3.20, 0.00) grounded=True counts=13/1/3/4 cue=HayBrush SFX_Niamh_HayBrush_01_v1
+Core_Persistent t=102.422 pos=(15.39, 0.86) velocity=(3.20, 0.00) grounded=True counts=14/1/3/4 cue=Step Hay SFX_Niamh_Step_hay_01_v1
+Core_Persistent t=102.682 pos=(16.18, 0.00) velocity=(3.20, 0.00) grounded=True counts=14/1/4/4 cue=Land light Dirt SFX_Niamh_Land_light_01_v1
+COMMAND STAGING: drop from y4 to existing dirt, checking heavy-impact classification only.
+Core_Persistent t=108.923 pos=(6.38, 0.00) velocity=(0.00, 0.00) grounded=True counts=14/1/5/4 cue=Land heavy Dirt SFX_Niamh_Land_heavy_02_v1
+PAUSE begin steps/jumps/lands/brush=14/1/5/4
+PAUSE observed counts=14/1/5/4 motionSourcesPlaying=False
+Forest markers=5 listeners=1 v8=True audio=True
+Ground_44.6_to_60.0=Grass bounds=Center: (52.30, -0.50, 0.00), Extents: (7.70, 0.50, 0.00)
+PitFloor_SmallGap_1.4u_WalkJump=Dirt bounds=Center: (30.70, -1.85, 0.00), Extents: (0.70, 0.25, 0.00)
+Ground_31.4_to_42.0=Grass bounds=Center: (36.70, -0.50, 0.00), Extents: (5.30, 0.50, 0.00)
+PitFloor_LargeGap_2.6u_RunJump=Dirt bounds=Center: (43.30, -2.05, 0.00), Extents: (1.30, 0.25, 0.00)
+Ground_0.0_to_30.0=Grass bounds=Center: (15.00, -0.50, 0.00), Extents: (15.00, 0.50, 0.00)
+Staged Forest pit contact: grounded=True collider=PitFloor_SmallGap_1.4u_WalkJump (UnityEngine.BoxCollider2D) surface=Dirt
+Audio disabled: sourcesPlaying=False playerEnabled=True

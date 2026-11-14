@@ -1,0 +1,18 @@
+{
+  "mappings": [
+    { "scene": "Ch1_S1_Village", "path": "Graybox Ground/Ground_0.0_to_38.4", "surface": 0,
+      "description": "Trial authored road: dirt, grass from x 0-2.5 and 30-34. Material IDs: dirt0 grass1 stone2 hay3 wood4.",
+      "regions": [{"from":0,"to":2.5,"surface":1},{"from":30,"to":34,"surface":1}] },
+    { "scene": "Ch1_S1_Village", "path": "StoneWall_Low_1.2u", "surface": 2, "description": "Existing low stone wall collider" },
+    { "scene": "Ch1_S1_Village", "path": "StoneWall_Tall_1.8u", "surface": 2, "description": "Existing manually tuned tall stone wall collider" },
+    { "scene": "Ch1_S1_Village", "path": "HayBale_0.9u", "surface": 3, "brush": true, "description": "Existing solid hay collider; proximity adds brush, no new trigger or geometry" },
+    { "scene": "Ch1_S1b_ForestPath", "path": "Graybox Ground/Ground_0.0_to_30.0", "surface": 1,
+      "description": "Trial authored grass path with dirt stretches x 8-14 and 24-29",
+      "regions": [{"from":8,"to":14,"surface":0},{"from":24,"to":29,"surface":0}] },
+    { "scene": "Ch1_S1b_ForestPath", "path": "Graybox Ground/Ground_31.4_to_42.0", "surface": 1, "description": "Grass segment" },
+    { "scene": "Ch1_S1b_ForestPath", "path": "Graybox Ground/Ground_44.6_to_60.0", "surface": 1,
+      "description": "Grass segment with dirt stretch x 48-52", "regions": [{"from":48,"to":52,"surface":0}] },
+    { "scene": "Ch1_S1b_ForestPath", "path": "PitFloor_SmallGap_1.4u_WalkJump", "surface": 0, "description": "Existing small-pit dirt floor" },
+    { "scene": "Ch1_S1b_ForestPath", "path": "PitFloor_LargeGap_2.6u_RunJump", "surface": 0, "description": "Existing large-pit dirt floor" }
+  ]
+}

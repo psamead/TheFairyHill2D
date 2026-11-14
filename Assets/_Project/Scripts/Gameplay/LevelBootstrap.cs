@@ -10,6 +10,7 @@ namespace TheFairyHills.Gameplay
         private IEnumerator Start()
         {
             Scene level = gameObject.scene;
+            SurfaceAudioProfile.ApplyLevel(level);
             bool loadedCoreHere = false;
             Scene core = SceneManager.GetSceneByName("Core_Persistent");
             if (!core.isLoaded)
