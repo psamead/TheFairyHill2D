@@ -1,0 +1,63 @@
+{
+  "status": "motion study; not integrated or accepted",
+  "fps": 20,
+  "source_canvas": [
+    327,
+    699
+  ],
+  "pivots": {
+    "head": [
+      180,
+      214
+    ],
+    "arm": [
+      219,
+      323
+    ],
+    "hip": [
+      187,
+      532
+    ],
+    "knee": [
+      185,
+      579
+    ]
+  },
+  "clips": {
+    "idle": 2,
+    "walk": 0.8,
+    "run": 0.5,
+    "jump": 2
+  },
+  "jump_pose": {
+    "far_leg_backward_degrees": 30,
+    "near_leg_backward_degrees": 19,
+    "arm_forward_degrees": 30,
+    "head_up_degrees": 6,
+    "descent_head_down_degrees": 6,
+    "descent_arm_backward_degrees": 34,
+    "descent_near_leg_forward_degrees": 30,
+    "descent_far_leg_forward_degrees": 22,
+    "fall_swing_start_seconds": 0.8,
+    "fall_swing_peak_seconds": 1.025,
+    "fall_swing_end_seconds": 1.25
+  },
+  "landing": {
+    "start_seconds": 1.25,
+    "duration_seconds": 0.3,
+    "body_and_hair_down_px": 3,
+    "head_and_arm_down_px": 4,
+    "hair_left_px": 1,
+    "arm_right_px": 1,
+    "foot_stays_fixed": true,
+    "whole_body_landing_scale": 1.0,
+    "takeoff_min_scale": 0.98
+  },
+  "limitations": [
+    "single rigid dress/cape",
+    "far leg derived from near leg",
+    "uses user-edited layers; check moving-arm backdrop",
+    "no separate elbow or knee weighting",
+    "no Unity validation"
+  ]
+}

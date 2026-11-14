@@ -213,3 +213,10 @@ Implemented from `TechnicalArt/CH1_UNITY_REVISION_v2.md` and `CommandForAgentToI
 
 - Synced `S1_prop_gate_rubble_L` from the live Unity Inspector: local position `(-1.92, 0.183, 0)` under `Village Gate`, world position `(24.49, 0.183, 0)`, and Sprite Renderer Order in Layer `-6`.
 - Updated the matching `rubble` entry in `S1_Village_layout_v3.json`. The builder already derives the child position and sorting order from the layout. The active Village scene is dirty, so I left it open and did not rebuild or save it. Existing scene and font asset changes remain untouched.
+
+## Niamh Motion v8 art staged — 2026-11-14
+
+- Copied the six same-canvas source PNGs and offline motion spec into `Assets/_Project/Art/Characters/Niamh/Motion_v8_Source/`. Copied the v8 GIF and contact sheet into `Docs/References/Niamh_Motion_v8/`; they are motion references, not runtime assets.
+- Design source and human/agent handoff: `../TheFairyHill_Design/TechArtAsset/Characters/Niamh/Motion_v8/UNITY_TRIAL_README.md` and `../TheFairyHill_Design/CommandForAgentToInitialRun/2026-11-14_Niamh_Motion_v8_Unity_Trial.md`; local copy: `Docs/Niamh_Motion_v8_Unity_Handoff.md`.
+- Status: files are staged in the project folder; Unity import and generated `.meta` files not yet confirmed. No prefab, Animator, runtime hookup, scene save, compilation, or Play Mode test has been done. The user-facing GIF is still only an offline study.
+- Next: execute the local handoff on the open Unity project. Preserve the persistent player root/collider and existing worktree changes; use a reversible visual trial and test Village and Forest.
