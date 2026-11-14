@@ -81,6 +81,15 @@ Paste this task into a new Codex conversation opened on the `TheFairyHill2D` pro
 
 ## Result log — fill after Unity work
 
+### Execution plan — 2026-11-14, Unity workstation
+
+- Baseline: Unity 6000.3.24f1, official Unity MCP confirmed `Application.dataPath` in this checkout; MainMenu open, not playing, no unsaved scene. Console error baseline: 0. Git HEAD `a0e96ff`; preserve Village and both modified TMP font assets, and the existing untracked `Docs/AI/UnityProjectContext.md`.
+- Use the six existing RGBA 327 × 699 PNGs and JSON; no new art transfer. Import at 100 PPU, bottom-center pivot, full canvas, uncompressed alpha. Build a separate six-part Transform puppet (derived far leg/boot), seven Animator states, and an explicit presentation component.
+- Expose only read-only grounded/facing/speed information from PlayerController2D. Keep its input, movement, physics and interaction authority. Preserve the old static renderer as the facing reference and rollback visual. Group the puppet at original sorting order 10.
+- Save only the narrow Core visual hookup. Do not run Chapter1SceneBuilder or rebuild/save Village or Forest. Keep the rig generator separate and rerunnable; it must refuse dirty Core edits.
+- Inspect Unity imports, compilation, rig references and magenta seams; then inspect the actual open project's Play Mode in Village and Forest. Automated test suites and duplicate projects remain paused under UNITY_AGENT_RULES.md. Record observed checks separately from owner acceptance and unperformed input/route checks.
+- Update this log and CH1_UNITY_PROGRESS. Keep proposed design progress/lessons in local Docs for the maintainer; the design repository stays read-only. Commit/push an explicit task allowlist and verify the remote ref.
+
 - Imported:
 - Prefab / clips / controller:
 - Player and scene hookup:
