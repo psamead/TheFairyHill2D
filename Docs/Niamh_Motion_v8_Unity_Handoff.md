@@ -6,6 +6,15 @@
 **Design source:** `TechArtAsset/Characters/Niamh/Motion_v8/`.
 **Unity target:** `TheFairyHill2D`, `Core_Persistent` player used by `Ch1_S1_Village` and `Ch1_S1b_ForestPath`.
 
+## Asset transfer route (network-first)
+
+- The six source PNGs and `motion_preview_spec.json` are already staged under `Assets/_Project/Art/Characters/Niamh/Motion_v8_Source/`. Use these project files; do not download art from GitHub or copy the same files again.
+- If a listed input is missing or corrupt, send the maintainer its exact design-repository relative path, purpose, target Unity path, and needed format. The maintainer will place the approved file in the shared design repository under `TechnicalArt/unity_drop/<date_task>/` and notify you.
+- Resolve that relative path from the shared repository root available on the Unity workstation. Network drive letters and computer-specific absolute paths vary. Copy only requested files into the Unity project; never move, delete, or edit shared source files. Record the copied files and source version in the result log.
+- GitHub remains for repository synchronization, code review, and backup. Use it for art transfer only if the shared network is unavailable and the maintainer explicitly selects that fallback.
+
+For the general student / future-agent procedure, read `Docs/AI/ART_ASSET_TRANSFER.md` and design repo `TechnicalArt/UNITY_AGENT_RULES.md`.
+
 ## Read first
 
 1. Unity repo root `AGENTS.md`, `Docs/AI/UnityProjectContext.md`, and current `git status --short` plus diffs.
