@@ -1,0 +1,3 @@
+# Preserve exact bytes of the transferred reference snapshots for their SHA-256 manifests.
+/Docs/References/Opening_Chapter1_Placeholder_v1/* -text
+/Docs/References/Niamh_Surface_Audio_v1/* -text

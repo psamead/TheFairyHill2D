@@ -1,3 +1,10 @@
 After page-2 double skip: active=Ch1_S1_Village opening=False gate=False listeners=1
 Skip requested on page index=0 elapsed=3.894296
 Post Skip: scene=Ch1_S1_Village block=False opening=False listeners=1 scale=1
+Manual Next/Next route: current=2 elapsed=0.2008495. Request Skip on third page.
+Third-page Skip -> card=True completionBefore=0. Double chapter Next.
+completionAfter=1 loading=True
+Final live integrated scene=Ch1_S1_Village scale=1 opening=False gate=False listeners=1
+BGM=Level Music volume=0.5
+playingLoopSources=1
+spawn=(3.50, 0.00) hasCross=False shamrocks=0 capsule=(0.23, 2.08)
