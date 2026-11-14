@@ -1,0 +1,8 @@
+Niamh Motion v8 - 2026-11-14 staged source SHA256
+Source version: pre-staged Motion_v8 from commit 17d61b3; no art recopy or pixel edit.
+70a584d17d392387c54bc7aedcc3a23b281e67368abbdbc7fd1519f10eb2d222  arm.png
+5b6f589a2384d93f3b1165e47d471a9e3bc6dd420d2f1ca140f8b47539f48779  body.png
+96480e1241cd11b45628c15e4a70b53946be8e796f2545aa36364073f7c21382  boot.png
+f3cbd6d3a5427dd38055eb4e139ee29c3bb0955b08a913ba08babf0108369e01  hair_back.png
+02d62246823a9f4aa2f863e22dd6559cb4be76c3453ca719bad7d6c822e37d05  head.png
+e5dd2563c515b6a12eea522aa727411cfd0d8edc3be1c22d275ee9c962fa1989  leg.png

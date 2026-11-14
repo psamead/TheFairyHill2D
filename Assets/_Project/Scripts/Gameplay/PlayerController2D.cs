@@ -39,6 +39,10 @@ namespace TheFairyHills.Gameplay
         private bool hasIronCrossFallback;
         public bool HasIronCross => GameState.Instance != null ? GameState.Instance.HasIronCross : hasIronCrossFallback;
         public Rigidbody2D Body => body;
+        public bool IsGrounded { get; private set; }
+        public bool FacingLeft => playerVisual != null && playerVisual.flipX;
+        public float WalkSpeed => walkSpeed;
+        public float RunSpeed => runSpeed;
 
         public void Configure(SpriteRenderer visual, ChapterHUD sceneHud, float minX, float maxX)
         {
@@ -147,6 +151,7 @@ namespace TheFairyHills.Gameplay
                 velocity.x = 0f;
 
             body.linearVelocity = velocity;
+            IsGrounded = grounded;
             if (grounded && body.position.y > -0.15f)
                 lastSafePosition = body.position;
         }

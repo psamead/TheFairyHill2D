@@ -1,0 +1,23 @@
+2026-11-14 Niamh v8 live/serialized inspection; not an automated gameplay test.
+dataPath=C:/Users/Administrator/Documents/UnityProject/TheFairyHill2D/Assets compilationFailed=False playing=True
+head rect=(x:0.00, y:0.00, width:327.00, height:699.00) pivot=(163.50, 0.00) ppu=100 compression=Uncompressed alpha=True mipmaps=False
+hair_back rect=(x:0.00, y:0.00, width:327.00, height:699.00) pivot=(163.50, 0.00) ppu=100 compression=Uncompressed alpha=True mipmaps=False
+body rect=(x:0.00, y:0.00, width:327.00, height:699.00) pivot=(163.50, 0.00) ppu=100 compression=Uncompressed alpha=True mipmaps=False
+arm rect=(x:0.00, y:0.00, width:327.00, height:699.00) pivot=(163.50, 0.00) ppu=100 compression=Uncompressed alpha=True mipmaps=False
+leg rect=(x:0.00, y:0.00, width:327.00, height:699.00) pivot=(163.50, 0.00) ppu=100 compression=Uncompressed alpha=True mipmaps=False
+boot rect=(x:0.00, y:0.00, width:327.00, height:699.00) pivot=(163.50, 0.00) ppu=100 compression=Uncompressed alpha=True mipmaps=False
+player=Niamh position=(3.50, 0.00) collider=(0.23, 2.08) offset=(0.08, 1.04)
+renderer=Niamh/Niamh Static Sprite enabled=False order=10 material=Sprite-Lit-Default shader=Universal Render Pipeline/2D/Sprite-Lit-Default
+renderer=FarLeg_Derived/Art enabled=True order=0 material=Sprite-Lit-Default shader=Universal Render Pipeline/2D/Sprite-Lit-Default
+renderer=Boot/Art enabled=True order=1 material=Sprite-Lit-Default shader=Universal Render Pipeline/2D/Sprite-Lit-Default
+renderer=NearLeg/Art enabled=True order=2 material=Sprite-Lit-Default shader=Universal Render Pipeline/2D/Sprite-Lit-Default
+renderer=Boot/Art enabled=True order=3 material=Sprite-Lit-Default shader=Universal Render Pipeline/2D/Sprite-Lit-Default
+renderer=HairBack/Art enabled=True order=4 material=Sprite-Lit-Default shader=Universal Render Pipeline/2D/Sprite-Lit-Default
+renderer=Body/Art enabled=True order=5 material=Sprite-Lit-Default shader=Universal Render Pipeline/2D/Sprite-Lit-Default
+renderer=Arm/Art enabled=True order=6 material=Sprite-Lit-Default shader=Universal Render Pipeline/2D/Sprite-Lit-Default
+renderer=Head/Art enabled=True order=7 material=Sprite-Lit-Default shader=Universal Render Pipeline/2D/Sprite-Lit-Default
+group order=10
+animator=Niamh_Motion_v8 rootMotion=False currentIdle=True normalizedTime=40.13419
+AudioListeners=1
+Forest live inspection time=109.8388 active=Ch1_S1b_ForestPath player=Niamh scene=Core_Persistent pos=(14.17, 1.02) grounded=False Idle=False normalized=0.387834 listeners=1
+Global light: Global Light 2D colour=RGBA(0.408, 0.471, 0.627, 1.000) intensity=0.28

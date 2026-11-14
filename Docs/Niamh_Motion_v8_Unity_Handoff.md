@@ -2,7 +2,7 @@
 
 **Project / readers:** The Fairy Hills; Unity Codex on the project computer, project owner, students, and future agents.
 **Purpose:** Integrate the user-reviewed Niamh v8 motion study into the existing game as a reversible playable trial.
-**Status:** Task ready. Six source PNGs and the JSON spec have been copied to the Unity repository. Unity import, rig, Animator, player hookup, compilation, Play Mode, and user acceptance are pending.
+**Status (2026-11-14):** Imported, assembled, hooked into Core, compiled and tried in the actual project's Village and Forest. Owner completed review and said the result is basically OK apart from some stutter. Stutter cause is unverified; no separate run-speed measurement was captured. See the result log below; the implementation outline is retained as the original brief.
 **Design source:** `TechArtAsset/Characters/Niamh/Motion_v8/`.
 **Unity target:** `TheFairyHill2D`, `Core_Persistent` player used by `Ch1_S1_Village` and `Ch1_S1b_ForestPath`.
 
@@ -90,13 +90,26 @@ Paste this task into a new Codex conversation opened on the `TheFairyHill2D` pro
 - Inspect Unity imports, compilation, rig references and magenta seams; then inspect the actual open project's Play Mode in Village and Forest. Automated test suites and duplicate projects remain paused under UNITY_AGENT_RULES.md. Record observed checks separately from owner acceptance and unperformed input/route checks.
 - Update this log and CH1_UNITY_PROGRESS. Keep proposed design progress/lessons in local Docs for the maintainer; the design repository stays read-only. Commit/push an explicit task allowlist and verify the remote ref.
 
-- Imported:
-- Prefab / clips / controller:
-- Player and scene hookup:
-- Compilation / Console:
-- Village Play Mode:
-- Forest Play Mode:
-- Screenshots or recording:
-- User review:
-- Known limits / next action:
-- Git branch / commit / push:
+- Imported: All six existing PNGs confirmed RGBA 327 × 699; individual full-rectangle Sprites, 100 PPU, pivot `(163.5, 0)` px, alpha, Bilinear, Clamp, no mipmaps, uncompressed. PNG contents were not edited or recopied; generated source/folder `.meta` files belong to this task.
+- Prefab / clips / controller: `Assets/_Project/Art/Characters/Niamh/Motion_v8_Trial/Niamh_Motion_v8_Trial.prefab`; `Animation/{Idle,Walk,Run,JumpUp,Apex,Fall,Land}.anim` and `Niamh_Motion_v8.controller`. Eight renderers use the six originals: far leg and boot are duplicates tinted 0.86. Hip/head/shoulder/knee pivots convert the JSON top-left coordinates. Far/near leg offsets are -9/+4 source px, matching the preview. Root scale is 0.30. SortingGroup order 10 preserves the original relationship with foreground order 12. All game materials match the old `Sprite-Lit-Default`; the diagnostic sheet temporarily uses unlit rendering.
+- Player and scene hookup: Added `NiamhMotionV8Presentation.cs`; PlayerController2D only gains read-only grounded, facing and speed properties plus assignment of its existing grounded result. Original input, physics, interaction and scene-loader logic are unchanged. Core gains one nested trial prefab and its references; original static child/reference remains. No Chapter1SceneBuilder run or level scene save/rebuild occurred. Capsule remains `(0.23, 2.08)`, offset `(0.08, 1.04)`; one gameplay AudioListener.
+- Compilation / Console: Unity Editor compilation successful (`scriptCompilationFailed=False`). Error baseline was 0; no trial errors observed at inspection. Unity AI certificate/account warnings are separate tooling warnings. No automated test suite, batchmode test, duplicate project, or standalone build was run.
+- Village Play Mode: Opened the saved Village in the actual Editor. Confirmed Core loads, eight trial renderers enable, old renderer hides, grounded idle continues over many normalized animation cycles; 1920 × 1080 screenshot saved. Later live observations record Village Walk/JumpUp/Apex/Fall/Land and the subsequent Village → Forest scene switch at game time 175.363 s while the owner was playing. This later switch was not invoked by the agent. Gate open/close was not separately instrumented.
+- Forest Play Mode: Called the existing `ChapterSceneLoader.LoadLevel` for a direct additive-loader inspection; this first switch does not prove an exit trigger. Core player survives; one listener; Global Light RGB approximately `(0.408, 0.471, 0.627)`, intensity 0.28. Subsequent live user input produced Walk, JumpUp, Apex, Fall, Land and Idle, with left/right facing and observed walking velocity ±3.2. Logs include landings at y=-1.6/-1.8 and jumping back out. This evidence does not establish every collision, intended run-jump gap clearance, gate, pickup, or exit trigger.
+- Screenshots or recording: `Docs/References/Niamh_Motion_v8/Unity_Trial/` contains Unity-rendered magenta poses (top: Idle/Walk/Run/JumpUp; bottom: Apex/Fall/Land/Fall-left), actual Game view screenshots, `Asset_Validation.txt` and live state observations. No video was recorded. Named state screenshots capture state entry and can include the 0.06-second crossfade; use the magenta sheet for full pose extremes. The original offline GIF/contact sheet are unchanged.
+- User review: Owner completed the session and reported “已经试玩结束，除了些卡顿，可能是各种软件一起运行的问题，其他基本ok”. Record basic trial acceptance with a stutter concern. The owner's suggested cause (many applications running) has not been profiled. Screenshot capture was also active during the review and may add overhead; this is another unverified contributor. No per-feature acceptance beyond the owner's overall statement is inferred. Play Mode was stopped after this feedback; Village remains open, no level scene was saved.
+- Known limits / next action: Six rigid parts only; no elbow/knee skinning or independent dress/cape. Modest landing affects upper pieces (3/4 px), leaving feet fixed; horizontal input can interrupt recovery after 0.10 s and jumping interrupts immediately. Walk/run curves compensate boot alpha bounds for floor contact but do not implement planted-foot IK. Fall is retimed to 0.32 s for the controller's real jump, not the offline 2 s loop. Recorded live states do not include Run/5.6u/s, so that specific check remains uncaptured despite the overall basic acceptance. If investigating stutter, first compare a review without screenshot capture and with other applications closed, then profile the actual project; do not diagnose from this session alone. Do not rebuild Chapter 1; if a later builder rebuild removes the hookup, use the dedicated install command below.
+- Git branch / commit / push: `main`; plan checkpoint `bb77510`. Implementation publication is recorded after the final allowlist review.
+
+### Reproduce or roll back
+
+1. Assets are already built. To regenerate explicitly, use **Tools → The Fairy Hills → Niamh v8 → 1 Build Trial Assets** outside Play Mode. This reads the staged JSON/PNGs and updates only trial assets/import settings.
+2. **2 Install In Core Only** opens Core additively if necessary and saves only that scene; it refuses an already dirty Core and skips an existing hookup. It does not rebuild either level. **3 Capture Magenta Pose Sheet** makes a temporary preview scene/camera and closes it, preserving the open scene.
+3. Enter Village or Forest Play Mode with the normal controls. In Edit Mode the static renderer stays visible and trial parts stay hidden; the presentation component switches them in Play Mode.
+4. For a one-click runtime rollback, disable `Niamh_Motion_v8_Trial` under Niamh, or disable its `NiamhMotionV8Presentation` component. It hides all puppet renderers and restores the static renderer; PlayerController2D still updates its facing. Re-enable the trial to resume. To persist the rollback, disable that child in Edit Mode and save only Core.
+
+### Protected work and maintainer handoff
+
+- The original Village scene, LiberationSans fallback, and untracked `Docs/AI/UnityProjectContext.md` remained byte-identical to the execution baseline at the post-install check. Fondamento was already modified at baseline and its dynamic cache changed further during Editor operations; it remains unstaged and uncommitted. No user edits were reset.
+- Found `runInBackground: 0` despite the explicit design rule. Enabled the live setting and saved the single `runInBackground: 1` line in `ProjectSettings/ProjectSettings.asset` after the review. This prevents the next session from stopping when the Editor loses focus; it is not a stutter fix or performance measurement.
+- Design source is read-only. `Docs/Niamh_Motion_v8_Design_Update.md` contains a factual update/lesson proposal for the maintainer to sync; no shared design files were changed.
