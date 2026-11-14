@@ -1,3 +1,4 @@
+using System.Collections;
 using TheFairyHills.Gameplay;
 using TMPro;
 using UnityEngine;
@@ -27,6 +28,8 @@ namespace TheFairyHills.UI
         [SerializeField] private GameObject settingsPanel;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private string firstGameplaySceneName = "Ch1_S1_Village";
+        [SerializeField] private string openingSceneName = "Opening_Chapter1";
+        private bool startingGame;
         private MainMenuOption focusedOption;
         private MainMenuOption lastMenuOption;
         private RectTransform selectionRect;
@@ -161,6 +164,7 @@ namespace TheFairyHills.UI
 
         public void StartGame()
         {
+            if (startingGame) return;
             if (!Application.CanStreamedLevelBeLoaded("Core_Persistent") ||
                 !Application.CanStreamedLevelBeLoaded(firstGameplaySceneName))
             {
@@ -172,7 +176,23 @@ namespace TheFairyHills.UI
             // Enter the level first. Its LevelBootstrap adds Core_Persistent and
             // attaches the already-loaded level, so this route also matches standalone
             // level testing and cannot lose a menu-owned transition coroutine.
-            SceneManager.LoadScene(firstGameplaySceneName, LoadSceneMode.Single);
+            startingGame = true;
+            StartCoroutine(EnterNewGame());
+        }
+
+        private IEnumerator EnterNewGame()
+        {
+            AudioSource[] sources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
+            float[] volumes = new float[sources.Length];
+            for (int i = 0; i < sources.Length; i++) volumes[i] = sources[i].volume;
+            for (float t = 0; t < 0.4f; t += Time.unscaledDeltaTime)
+            {
+                for (int i = 0; i < sources.Length; i++)
+                    if (sources[i] != null && sources[i].loop) sources[i].volume = volumes[i] * (1 - t / 0.4f);
+                yield return null;
+            }
+            SceneManager.LoadScene(!string.IsNullOrEmpty(openingSceneName) && Application.CanStreamedLevelBeLoaded(openingSceneName)
+                ? openingSceneName : firstGameplaySceneName, LoadSceneMode.Single);
         }
 
         private void MoveSelection(int direction)

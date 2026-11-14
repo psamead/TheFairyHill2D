@@ -1,0 +1,1 @@
+请读取并执行 Docs/References/Opening_Chapter1_Placeholder_v1/2026-11-14_Opening_Chapter1_Placeholder_Unity_Trial.md。用户已授权用预置 OP01 放大图占位接入开场故事引入和第一章封面，在实际 Unity 工程跑出效果，记录截图及 Handoff，核对并分批完成之前已批准的动作音试装，然后只提交和推送任务自己的文件。素材已从共享网络复制并核对散列，不从 GitHub 下载美术。保护现有场景和字体人工修改。下次设计新对话先读你的反馈，再继续 Niamh 推门和举十字架动作。

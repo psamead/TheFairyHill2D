@@ -77,6 +77,11 @@ namespace TheFairyHills.Gameplay
 
         private void Update()
         {
+            if (OpeningSequencePlayer.BlocksGameplay)
+            {
+                horizontalInput = 0; jumpBufferTimer = 0; jumpCutQueued = false;
+                return;
+            }
             Keyboard keyboard = Keyboard.current;
             if (keyboard == null)
             {
@@ -115,6 +120,7 @@ namespace TheFairyHills.Gameplay
 
         private void FixedUpdate()
         {
+            if (OpeningSequencePlayer.BlocksGameplay) { body.linearVelocity = Vector2.zero; return; }
             bool grounded = CheckGrounded();
             if (grounded)
                 coyoteTimer = coyoteDuration;

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "project": "The Fairy Hills",
+  "date": "2026-11-14",
+  "status": "copied_over_shared_network_sha256_verified_not_integrated",
+  "files": [
+    {
+      "design_source": "TechArtAsset/Storyboards/Opening_v1/placeholder/OP01_friends_dusk_placeholder_v1.png",
+      "unity_target": "Assets/_Project/Art/Storyboards/Opening_v1/placeholder/OP01_friends_dusk_placeholder_v1.png",
+      "sha256": "556d74b13b65abc123ebc88020ab506aac11b4ab04c73398ca501cb0fdf26aa3",
+      "bytes": 6155635,
+      "verified": true
+    },
+    {
+      "design_source": "TechArtAsset/Storyboards/Opening_v1/placeholder/opening_sequence_v1.json",
+      "unity_target": "Docs/References/Opening_Chapter1_Placeholder_v1/opening_sequence_v1.json",
+      "sha256": "d55d91bc0495b77529225df8abcfcf7c46294c905c9b03d19b80d828807b044c",
+      "bytes": 1629,
+      "verified": true
+    },
+    {
+      "design_source": "CommandForAgentToInitialRun/2026-11-14_Opening_Chapter1_Placeholder_Unity_Trial.md",
+      "unity_target": "Docs/References/Opening_Chapter1_Placeholder_v1/2026-11-14_Opening_Chapter1_Placeholder_Unity_Trial.md",
+      "sha256": "05b11f5dc3e39c7e77bcd3f2e0a2c9dd1057d6a34639001aaeb527a28ed7b929",
+      "bytes": 7217,
+      "verified": true
+    },
+    {
+      "design_source": "TechnicalArt/STORYBOARD_KNOWLEDGE_BASE.md",
+      "unity_target": "Docs/References/Opening_Chapter1_Placeholder_v1/STORYBOARD_KNOWLEDGE_BASE.md",
+      "sha256": "73d7894e754e704b3f4284aa1e2b95fb519c5f868d37b422097983fcef2a795f",
+      "bytes": 6139,
+      "verified": true
+    },
+    {
+      "design_source": "TechnicalArt/SLIDESHOW_OPENING_v1.md",
+      "unity_target": "Docs/References/Opening_Chapter1_Placeholder_v1/SLIDESHOW_OPENING_v1.md",
+      "sha256": "f6745220c8a01500f5ebcc59add1119efda23d6375442434bab5e513a4b60947",
+      "bytes": 8673,
+      "verified": true
+    },
+    {
+      "design_source": "TechnicalArt/CHAPTER_TRANSITIONS_AND_SURFACE_AUDIO_v1.md",
+      "unity_target": "Docs/References/Opening_Chapter1_Placeholder_v1/CHAPTER_TRANSITIONS_AND_SURFACE_AUDIO_v1.md",
+      "sha256": "ece69f929e0f029d3a86100448e9af9ac0a548631e875355a8ed2e77d025cb85",
+      "bytes": 13752,
+      "verified": true
+    },
+    {
+      "design_source": "TechnicalArt/UNITY_AGENT_RULES.md",
+      "unity_target": "Docs/References/Opening_Chapter1_Placeholder_v1/UNITY_AGENT_RULES.md",
+      "sha256": "ccf4c7a10c7ecafac19e29603a0f838f076f9db2d2ab05eb2d5890f3dd753082",
+      "bytes": 6517,
+      "verified": true
+    },
+    {
+      "design_source": "TechnicalArt/妖精丘陵_开场故事画与章节过渡交接_v2.docx",
+      "unity_target": "Docs/References/Opening_Chapter1_Placeholder_v1/妖精丘陵_开场故事画与章节过渡交接_v2.docx",
+      "sha256": "48be9ada62a173cb628a1f41421cebb391bfa1c64ccac8db8e9f5ca9ab9e1d79",
+      "bytes": 13444018,
+      "verified": true
+    }
+  ],
+  "do_not_use_github_for_art": true,
+  "placeholder_not_final_art": true
+}

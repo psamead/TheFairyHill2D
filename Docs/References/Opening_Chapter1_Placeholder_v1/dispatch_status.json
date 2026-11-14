@@ -1,0 +1,30 @@
+{
+  "project": "The Fairy Hills",
+  "recorded_date": "2026-11-14",
+  "transfer_status": "complete_sha256_verified",
+  "files_verified": 8,
+  "agent_dispatch_status": "not_started_no_remote_execution_channel",
+  "remote_thread_available": false,
+  "execution_attempts": [
+    {
+      "method": "Codex app list_threads",
+      "result": "Only local host threads returned; no target Unity workstation thread available"
+    },
+    {
+      "method": "SSH BatchMode existing access",
+      "result": "haoxi-rtx port 22 connection timed out; no remote command executed"
+    },
+    {
+      "method": "WinRM existing access",
+      "result": "Current authentication requires HTTPS or TrustedHosts configuration; command not executed; security configuration not changed"
+    }
+  ],
+  "manual_start": "On the Unity workstation, open TheFairyHill2D in its existing Codex chat and paste SEND_TO_UNITY_CODEX.txt.",
+  "unity_task": "Docs/References/Opening_Chapter1_Placeholder_v1/2026-11-14_Opening_Chapter1_Placeholder_Unity_Trial.md",
+  "expected_feedback": "Docs/Opening_Chapter1_Placeholder_Unity_Handoff.md",
+  "integration": "pending",
+  "compilation": "not_run",
+  "play_mode": "not_run",
+  "owner_acceptance": "pending",
+  "art_approval": "temporary_placeholder_only"
+}

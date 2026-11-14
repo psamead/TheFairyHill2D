@@ -1,0 +1,5 @@
+2026-11-14T20:27:13 Village_After_Opening time=28.51575 scale=1 gate=False listeners=1
+2026-11-14T20:27:32 OP01 time=47.00268 scale=1 gate=True listeners=1
+2026-11-14T20:27:38 OP02 time=53.60467 scale=1 gate=True listeners=1
+2026-11-14T20:27:46 OP03 time=61.20513 scale=1 gate=True listeners=1
+2026-11-14T20:27:53 Chapter_I time=67.80537 scale=1 gate=True listeners=1

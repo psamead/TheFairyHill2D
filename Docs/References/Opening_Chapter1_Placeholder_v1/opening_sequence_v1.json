@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "project": "The Fairy Hills",
+  "status": "authorized_placeholder_trial_not_final_art",
+  "image": "Assets/_Project/Art/Storyboards/Opening_v1/placeholder/OP01_friends_dusk_placeholder_v1.png",
+  "image_dimensions": [
+    2912,
+    1632
+  ],
+  "preserve_aspect": true,
+  "transition_seconds": 0.4,
+  "maximum_zoom": 1.02,
+  "frames": [
+    {
+      "id": "OP01",
+      "duration_seconds": 6,
+      "caption": "At dusk, the hills were still a place to play.",
+      "art_status": "OP01 candidate approved for placeholder"
+    },
+    {
+      "id": "OP02",
+      "duration_seconds": 7,
+      "caption": "Then Oisín heard something Niamh could not.",
+      "art_status": "reuses OP01; dedicated summons illustration not produced"
+    },
+    {
+      "id": "OP03",
+      "duration_seconds": 6,
+      "caption": "Oisín ran towards the trees. Niamh followed.",
+      "art_status": "reuses OP01; dedicated pursuit illustration not produced"
+    }
+  ],
+  "chapter_card": {
+    "number": "CHAPTER I",
+    "title": "THE THRESHOLD",
+    "title_status": "working title from design; configurable",
+    "duration_seconds": 2,
+    "background": "same placeholder image with runtime UI darkening"
+  },
+  "next_scene": "Ch1_S1_Village",
+  "standalone_level_debug_plays_opening": false,
+  "controls": {
+    "next": [
+      "Space",
+      "Enter",
+      "Next button"
+    ],
+    "skip": [
+      "Escape",
+      "Skip button"
+    ]
+  },
+  "acceptance_pending": [
+    "Unity import",
+    "Integration",
+    "Compilation",
+    "Play Mode",
+    "Owner review"
+  ]
+}
