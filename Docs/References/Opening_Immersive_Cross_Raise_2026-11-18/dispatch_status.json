@@ -22,8 +22,14 @@
     {
       "method": "existing WinRM access",
       "result": "authentication transport/TrustedHosts configuration rejected; configuration unchanged"
+    },
+    {
+      "method": "existing desktop-session inventory",
+      "result": "no open Remote Desktop window/session available; no UI input performed"
     }
   ],
   "expected_feedback": "Docs/Opening_Immersive_Cross_Raise_Unity_Handoff.md",
-  "owner_acceptance": "pending"
+  "owner_acceptance": "pending",
+  "task_ready_for_execution": true,
+  "source_checkpoint_commit": "cc815f831399db54056ac7b59186166b2f1e101d"
 }
