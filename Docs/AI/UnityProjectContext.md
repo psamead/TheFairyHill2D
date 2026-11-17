@@ -69,3 +69,5 @@ Surface audio v1 is now imported/integrated/compiled with actual Editor cue obse
 设计端已将本轮代码与举高姿势复制进实际工程，离线 C# 类型检查通过，尚未在 Editor 导入/Play Mode 验证。负责人已授权网络电脑 Codex 继续检查。任务单唯一入口留在共享设计仓库 `CommandForAgentToInitialRun/2026-11-18_Opening_Immersive_Cross_Raise_Unity_Validation.md`，直接从共享目录读取，不复制任务单进Unity工程。沿现有代码做实机检查与最小修复；不要重跑11月14日旧任务或重建关卡。素材/代码散列见 `Docs/References/Opening_Immersive_Cross_Raise_2026-11-18/implementation_manifest.json`。
 
 这轮包括守灯人式铺满故事画与叠加字幕、按键字母下划线、Q 对受控红墙时直接举高十字架并恢复。采用 B，无胸前中间停留；保留原墙体效果，不新增大光束。完成后写 `Docs/Opening_Immersive_Cross_Raise_Unity_Handoff.md` 和同目录 `Unity_Trial/result.json`。用户要求做完后设计端汇总文档再 git push；网络端本地提交自己的任务文件，暂不 push。保护原场景/字体/AGENTS 修改。文件交接已完成不等于 Codex 已启动。
+
+**2026-11-18 休息期间推送授权：** 负责人明确可以传大文件，当前源码、美术、PSD及全部保留GIF发展记录先提交推送；本轮Editor/Play Mode仍待网络电脑执行，回报后再同步运行结论。任务单仍只在共享设计目录。
