@@ -35,6 +35,8 @@ namespace TheFairyHills.Gameplay
         private bool jumpCutQueued;
         private Vector2 lastSafePosition;
         private PlayerInteractionTarget nearestTarget;
+        private float ironPulsePoseRemaining;
+        private NiamhMotionV8Presentation motionPresentation;
 
         private bool hasIronCrossFallback;
         public bool HasIronCross => GameState.Instance != null ? GameState.Instance.HasIronCross : hasIronCrossFallback;
@@ -83,6 +85,13 @@ namespace TheFairyHills.Gameplay
             if (OpeningSequencePlayer.BlocksGameplay)
             {
                 horizontalInput = 0; jumpBufferTimer = 0; jumpCutQueued = false;
+                return;
+            }
+            if (ironPulsePoseRemaining > 0)
+            {
+                ironPulsePoseRemaining = Mathf.Max(0, ironPulsePoseRemaining - Time.deltaTime);
+                horizontalInput = 0; jumpBufferTimer = 0; jumpCutQueued = false;
+                RefreshInteractionPrompt();
                 return;
             }
             Keyboard keyboard = Keyboard.current;
@@ -166,6 +175,14 @@ namespace TheFairyHills.Gameplay
                 lastSafePosition = body.position;
         }
 
+        private void OnDisable()
+        {
+            ironPulsePoseRemaining = 0;
+            horizontalInput = 0;
+            jumpBufferTimer = 0;
+            jumpCutQueued = false;
+        }
+
         private bool CheckGrounded()
         {
             GroundCollider = null;
@@ -216,6 +233,7 @@ namespace TheFairyHills.Gameplay
 
         private void ReleaseIronPulse()
         {
+            if (ironPulsePoseRemaining > 0) return;
             if (!HasIronCross)
             {
                 if (hud != null) hud.ShowMessage("The iron cross is still missing.", 2f);
@@ -240,7 +258,16 @@ namespace TheFairyHills.Gameplay
             }
 
             if (nearestWall != null)
+            {
+                if (playerVisual != null) playerVisual.flipX = nearestWall.transform.position.x < transform.position.x;
+                if (motionPresentation == null) motionPresentation = GetComponentInChildren<NiamhMotionV8Presentation>();
+                if (motionPresentation != null && motionPresentation.TryShowRaisedCross(ThornWall.BanishPresentationSeconds))
+                {
+                    ironPulsePoseRemaining = ThornWall.BanishPresentationSeconds;
+                    horizontalInput = 0; jumpBufferTimer = 0; jumpCutQueued = false;
+                }
                 nearestWall.Disperse();
+            }
             else if (hud != null)
                 hud.ShowMessage("The IronPulse needs a controlled thorn wall nearby.", 2f);
         }

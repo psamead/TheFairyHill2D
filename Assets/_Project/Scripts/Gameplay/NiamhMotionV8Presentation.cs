@@ -24,6 +24,65 @@ namespace TheFairyHills.Gameplay
         private float landingRemaining;
         private Vector3 authoredScale;
         private bool staticWasEnabled;
+        private SpriteRenderer raisedVisual;
+        private Sprite raisedSprite;
+        private float raisedRemaining;
+        private bool[] partVisibilityBeforeRaise;
+
+        public bool TryShowRaisedCross(float duration)
+        {
+            if (!isActiveAndEnabled || parts == null) return false;
+            if (raisedSprite == null) raisedSprite = Resources.Load<Sprite>("Niamh/CrossRaisedStory");
+            if (raisedSprite == null)
+            {
+                Debug.LogWarning("Raised-cross sprite is missing; keeping the normal v8 visual.", this);
+                return false;
+            }
+            if (raisedVisual == null)
+            {
+                var child = new GameObject("Raised Cross Story Pose");
+                child.transform.SetParent(transform, false);
+                raisedVisual = child.AddComponent<SpriteRenderer>();
+                raisedVisual.sprite = raisedSprite;
+                raisedVisual.sortingOrder = 8;
+                foreach (var part in parts)
+                    if (part != null)
+                    {
+                        raisedVisual.sharedMaterial = part.sharedMaterial;
+                        raisedVisual.sortingLayerID = part.sortingLayerID;
+                        break;
+                    }
+            }
+            if (raisedRemaining <= 0)
+            {
+                partVisibilityBeforeRaise = new bool[parts.Length];
+                for (int i = 0; i < parts.Length; i++)
+                    partVisibilityBeforeRaise[i] = parts[i] != null && parts[i].enabled;
+            }
+            raisedRemaining = Mathf.Max(raisedRemaining, duration);
+            SetPartsVisible(false);
+            raisedVisual.enabled = true;
+            ApplyFacing();
+            return true;
+        }
+
+        private void EndRaisedCross()
+        {
+            raisedRemaining = 0;
+            if (raisedVisual != null) raisedVisual.enabled = false;
+            if (partVisibilityBeforeRaise != null)
+                for (int i = 0; i < parts.Length && i < partVisibilityBeforeRaise.Length; i++)
+                    if (parts[i] != null) parts[i].enabled = partVisibilityBeforeRaise[i];
+            partVisibilityBeforeRaise = null;
+            currentState = 0;
+        }
+
+        private void ApplyFacing()
+        {
+            Vector3 scale = authoredScale;
+            scale.x = Mathf.Abs(scale.x) * (player != null && player.FacingLeft ? -1f : 1f);
+            transform.localScale = scale;
+        }
 
         public void Configure(PlayerController2D controller, SpriteRenderer rollbackVisual)
         {
@@ -53,9 +112,13 @@ namespace TheFairyHills.Gameplay
         private void Update()
         {
             if (player == null || player.Body == null || animator == null) return;
-            Vector3 scale = authoredScale;
-            scale.x = Mathf.Abs(scale.x) * (player.FacingLeft ? -1f : 1f);
-            transform.localScale = scale;
+            ApplyFacing();
+            if (raisedRemaining > 0)
+            {
+                raisedRemaining -= Time.deltaTime;
+                if (raisedRemaining > 0) return;
+                EndRaisedCross();
+            }
 
             Vector2 velocity = player.Body.linearVelocity;
             bool grounded = player.IsGrounded;
@@ -90,6 +153,7 @@ namespace TheFairyHills.Gameplay
 
         private void OnDisable()
         {
+            EndRaisedCross();
             SetPartsVisible(false);
             if (staticVisual != null) staticVisual.enabled = staticWasEnabled;
         }

@@ -11,6 +11,8 @@ namespace TheFairyHills.Gameplay
             public Sprite image;
             [TextArea] public string caption;
             [Min(0.5f)] public float duration = 6;
+            public Vector2 captionAnchorMin = new Vector2(0.12f, 0.12f);
+            public Vector2 captionAnchorMax = new Vector2(0.88f, 0.28f);
         }
         public Frame[] frames;
         public Sprite chapterImage;

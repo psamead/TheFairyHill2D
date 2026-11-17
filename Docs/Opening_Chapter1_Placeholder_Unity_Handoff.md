@@ -33,3 +33,7 @@ Project: The Fairy Hills / Unity 6000.3.24f1. Readers: owner, production, studen
 - All eight opening payload hashes/lengths and 23 audio payload hashes were rechecked after implementation. Targeted `.gitattributes` preserves exact transferred snapshot bytes across Git checkout line-ending settings. Shared design source remains read-only; no copied placeholder was relabeled final art.
 - Remaining local-only changes at review: `AGENTS.md`, `Assets/Scenes/Ch1_S1_Village.unity`, LiberationSans fallback and Fondamento SDF. These four are excluded from all task commits. Publication result is appended after remote verification.
 - Publication succeeded on `main`: opening `673bbcc`, audio `a668374`, evidence/cleanup `536b0913087b81964e19e3e710c5cfc3caa79e75`. `git -c http.version=HTTP/1.1 push origin main` succeeded; `git ls-remote origin refs/heads/main` matched that full cleanup commit. Tracking branch was synchronized and the four protected files still matched baseline bytes. This publication note is a subsequent documentation-only commit, pushed and rechecked separately.
+
+## 2026-11-18 Source trial pending actual Editor check
+
+New interface/key underline and raised-cross presentation source was applied after the historical results above. See `Docs/Opening_Immersive_Cross_Raise_Implementation.md`; the shared design task is the sole execution instruction. Offline type-check passed; this dated update does not extend the old Play Mode evidence to the new changes.

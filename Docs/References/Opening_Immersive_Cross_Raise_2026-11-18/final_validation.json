@@ -1,0 +1,14 @@
+{
+  "exit_code": 0,
+  "method": "Offline Roslyn C#9 type-check against actual Unity DLLs; not Editor or Play Mode verification",
+  "utc": "2026-11-17T18:02:17.412542+00:00",
+  "sources": {
+    "ChapterHUD.cs": "6e246f291e2fc4a7db53c2e0d636d15776089a5569310e5089a181bc41f8941d",
+    "KeyHintUnderlines.cs": "9192d3110971e2b48e8fcaa6c696acdbd3f15f4a9b7fc8839ec73b018100adcf",
+    "NiamhMotionV8Presentation.cs": "d711f0c397f3f93e7b65278371f9e33988bced878fb52586ea7e0c8e1943f52b",
+    "OpeningSequenceData.cs": "3caafada321226b1c73e72f185fe228c5f735479e5f52d821cbd355d9e15276b",
+    "OpeningSequencePlayer.cs": "ce6465e3aaad49e396885749862a106d09edfc78207f1bb69cae9382092f0d46",
+    "PlayerController2D.cs": "a25fab4b7f347fc98a47ee93dc15d3a401ec76d358ec64c8a22bd70185f45238",
+    "ThornWall.cs": "70d37ecc4467cba2b3ddb94dcaf5e75730a6a2c47ddc8e37dddca2fe1cc41d81"
+  }
+}

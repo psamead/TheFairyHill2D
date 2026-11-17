@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-18",
+  "utc": "2026-11-17T18:10:24.164156+00:00",
+  "handoff_method": "read the single task in the shared design CommandForAgentToInitialRun directory; no Unity task copy",
+  "task": "CommandForAgentToInitialRun\\2026-11-18_Opening_Immersive_Cross_Raise_Unity_Validation.md",
+  "unity_task_copy": false,
+  "files_transferred_and_sha256_verified": true,
+  "source_implementation_applied": true,
+  "offline_csharp_typecheck": "passed",
+  "agent_process_started": false,
+  "editor_import_verified": false,
+  "playmode_verified": false,
+  "attempts": [
+    {
+      "method": "Codex list_threads/list_projects",
+      "result": "only local host and projects available"
+    },
+    {
+      "method": "existing SSH BatchMode access",
+      "result": "haoxi-rtx port 22 timed out"
+    },
+    {
+      "method": "existing WinRM access",
+      "result": "authentication transport/TrustedHosts configuration rejected; configuration unchanged"
+    }
+  ],
+  "expected_feedback": "Docs/Opening_Immersive_Cross_Raise_Unity_Handoff.md",
+  "owner_acceptance": "pending"
+}

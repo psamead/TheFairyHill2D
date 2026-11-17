@@ -1,0 +1,3 @@
+ShareWorkFolder\TechnicalArt\unity_drop\2026-11-18_Opening_Immersive_Cross_Raise\code\NiamhMotionV8Presentation.cs(11,51): warning CS0649: Field 'NiamhMotionV8Presentation.parts' is never assigned to, and will always have its default value null
+ShareWorkFolder\TechnicalArt\unity_drop\2026-11-18_Opening_Immersive_Cross_Raise\code\NiamhMotionV8Presentation.cs(10,43): warning CS0649: Field 'NiamhMotionV8Presentation.animator' is never assigned to, and will always have its default value null
+\\haoxi-rtx\C\Users\Administrator\Documents\UnityProject\TheFairyHill2D\Assets\_Project\Scripts\Gameplay\NiamhSurfaceAudio.cs(9,54): warning CS0649: Field 'NiamhSurfaceAudio.profile' is never assigned to, and will always have its default value null

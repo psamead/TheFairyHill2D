@@ -14,6 +14,20 @@ namespace TheFairyHills.Gameplay
         [SerializeField] private GameObject promptPanel;
         [SerializeField] private GameObject messagePanel;
         private Coroutine messageRoutine;
+        private string lastRawPrompt;
+        private bool promptFormatted;
+
+        private void Awake()
+        {
+            foreach (TMP_Text label in GetComponentsInChildren<TMP_Text>(true))
+                if (label.gameObject.name == "Controls")
+                {
+                    label.text = KeyHintUnderlines.Format(label.text, true);
+                    KeyHintUnderlines.Attach(label);
+                }
+            KeyHintUnderlines.Attach(promptText);
+            KeyHintUnderlines.Attach(messageText);
+        }
 
         public void Configure(TMP_Text prompt, TMP_Text message, GameObject promptFrame = null, GameObject messageFrame = null)
         {
@@ -21,15 +35,19 @@ namespace TheFairyHills.Gameplay
             messageText = message;
             promptPanel = promptFrame;
             messagePanel = messageFrame;
+            KeyHintUnderlines.Attach(promptText);
+            KeyHintUnderlines.Attach(messageText);
             if (promptPanel != null) promptPanel.SetActive(false);
             if (messagePanel != null) messagePanel.SetActive(false);
         }
 
         public void SetPrompt(string prompt)
         {
-            if (promptText != null && promptText.text != prompt)
+            if (promptText != null && (lastRawPrompt != prompt || !promptFormatted))
             {
-                promptText.text = prompt;
+                lastRawPrompt = prompt;
+                promptFormatted = true;
+                promptText.text = KeyHintUnderlines.Format(prompt);
                 FitPanelToText(promptText, promptPanel);
             }
             if (promptPanel != null && promptPanel.activeSelf != !string.IsNullOrEmpty(prompt))
@@ -40,7 +58,7 @@ namespace TheFairyHills.Gameplay
         {
             if (messageText == null) return;
             if (messageRoutine != null) StopCoroutine(messageRoutine);
-            messageText.text = message;
+            messageText.text = KeyHintUnderlines.Format(message);
             FitPanelToText(messageText, messagePanel);
             if (messagePanel != null) messagePanel.SetActive(true);
             messageRoutine = StartCoroutine(ClearMessageAfter(seconds));

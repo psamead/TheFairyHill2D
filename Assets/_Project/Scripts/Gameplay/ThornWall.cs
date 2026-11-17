@@ -7,6 +7,9 @@ namespace TheFairyHills.Gameplay
     /// <summary>Runs the IronPulse burn sequence, effects, and barrier removal.</summary>
     public sealed class ThornWall : MonoBehaviour
     {
+        private const float GlowFadeSeconds = 0.3f;
+        private const float DissolveSeconds = 1.6f;
+        public static float BanishPresentationSeconds => GlowFadeSeconds + DissolveSeconds;
         private static readonly int GlowBaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int BurnId = Shader.PropertyToID("_Burn");
         private static readonly Color GlowTint = new Color(176f / 255f, 32f / 255f, 42f / 255f, 1f);
@@ -106,7 +109,7 @@ namespace TheFairyHills.Gameplay
         {
             float initialGlowAlpha = glowRenderer != null ? currentGlowAlpha : 0f;
             float initialLightIntensity = redLight != null ? redLight.intensity : 0f;
-            const float glowDuration = 0.3f;
+            const float glowDuration = GlowFadeSeconds;
             float elapsed = 0f;
             while (elapsed < glowDuration)
             {
@@ -122,7 +125,7 @@ namespace TheFairyHills.Gameplay
             if (sfxSource != null && banishClip != null) sfxSource.PlayOneShot(banishClip);
             Coroutine flash = flashLight != null ? StartCoroutine(FadePulseLight()) : null;
 
-            const float dissolveDuration = 1.6f;
+            const float dissolveDuration = DissolveSeconds;
             elapsed = 0f;
             while (elapsed < dissolveDuration)
             {

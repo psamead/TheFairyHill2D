@@ -122,3 +122,7 @@ The owner requested matching the additional gold front-panel ornament from the n
 Source overlay: design `TechArtAsset/Characters/Niamh/Motion_v8/appearance_front_ornament_v1/`. The original user-source PSD snapshot remains historical; use the new editable overlay sources or current parts PNGs for this appearance. Copy manifest and hashes: `Docs/References/Niamh_Front_Ornament_2026-11-17/sync_manifest.json`. Backups are in the design task drop `TechnicalArt/unity_drop/2026-11-17_Niamh_Front_Ornament/previous/`.
 
 Validation status: asset identity, dimensions, alpha, localized pixel change, prefab GUID reference and unchanged meta verified from repository files. No connected Editor/Console or Play Mode observation was available in this session, so import completion and in-game appearance are not claimed. No scripts were changed or automated tests run. Review the new ornament in Village/Forest when the Editor refreshes. This update does not integrate the new cross poses, animation or beam VFX.
+
+## 2026-11-18 Source trial pending actual Editor check
+
+New interface/key underline and raised-cross presentation source was applied after the historical results above. See `Docs/Opening_Immersive_Cross_Raise_Implementation.md`; the shared design task is the sole execution instruction. Offline type-check passed; this dated update does not extend the old Play Mode evidence to the new changes.

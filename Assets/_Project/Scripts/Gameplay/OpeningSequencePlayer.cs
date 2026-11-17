@@ -30,6 +30,14 @@ namespace TheFairyHills.Gameplay
         private float acceptAfter;
         private bool transitioning;
         private ChapterHUD hiddenHud;
+        [SerializeField] private bool storybookLayout = true;
+        private UnityEngine.UI.Image captionShade;
+        private Texture2D shadeTexture;
+        private Sprite shadeSprite;
+        private Material captionMaterial;
+        private TMP_Text navigationHint;
+        private Vector2 lastStoryScreenSize;
+        private Sprite lastStorySprite;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetSession() => BlocksGameplay = false;
@@ -37,6 +45,7 @@ namespace TheFairyHills.Gameplay
         private void Awake()
         {
             BlocksGameplay = true;
+            if (storybookLayout) ApplyStorybookLayout();
             blackFade.alpha = 1;
             nextButton.onClick.AddListener(RequestAdvance);
             skipButton.onClick.AddListener(RequestSkip);
@@ -105,6 +114,20 @@ namespace TheFairyHills.Gameplay
             chapterTitle.text = IsChapterCard ? data.chapterTitle : "";
             chapterDim.color = new Color(0, 0, 0, IsChapterCard ? 0.64f : 0);
             skipButton.gameObject.SetActive(!IsChapterCard);
+            if (storybookLayout)
+            {
+                if (captionShade != null) captionShade.gameObject.SetActive(!IsChapterCard);
+                if (navigationHint != null) navigationHint.gameObject.SetActive(!IsChapterCard);
+                if (!IsChapterCard)
+                {
+                    var frame = data.frames[index];
+                    Vector2 min = frame.captionAnchorMin, max = frame.captionAnchorMax;
+                    if (max.x <= min.x || max.y <= min.y)
+                    { min = new Vector2(0.12f, 0.12f); max = new Vector2(0.88f, 0.28f); }
+                    SetRect(caption.rectTransform, min, max);
+                }
+                FitStoryPicture();
+            }
             if (first)
             {
                 for (float t = 0; t < data.fadeDuration; t += Time.unscaledDeltaTime)
@@ -211,6 +234,9 @@ namespace TheFairyHills.Gameplay
 
         private void OnDestroy()
         {
+            if (captionMaterial != null) Destroy(captionMaterial);
+            if (shadeSprite != null) Destroy(shadeSprite);
+            if (shadeTexture != null) Destroy(shadeTexture);
             BlocksGameplay = false;
             if (hiddenHud != null) hiddenHud.gameObject.SetActive(true);
         }
@@ -221,6 +247,86 @@ namespace TheFairyHills.Gameplay
             if (hiddenHud != null) hiddenHud.gameObject.SetActive(true);
             if (blackFade != null) blackFade.alpha = 0;
             if (music != null) music.Stop();
+        }
+
+        private static void SetRect(RectTransform rect, Vector2 min, Vector2 max)
+        {
+            rect.anchorMin = min; rect.anchorMax = max;
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+        }
+
+        // Reuse the authored Canvas and controls; this trial is reversible in the Inspector.
+        private void ApplyStorybookLayout()
+        {
+            picture.preserveAspect = false;
+            picture.raycastTarget = false;
+            Transform divider = captionGroup.transform.Find("Caption Divider");
+            if (divider != null) divider.gameObject.SetActive(false);
+            pageLabel.gameObject.SetActive(false);
+            caption.fontSize = 36;
+            caption.color = new Color(1f, 0.97f, 0.88f);
+            caption.alignment = TextAlignmentOptions.Center;
+            caption.enableAutoSizing = true;
+            caption.fontSizeMin = 28; caption.fontSizeMax = 36;
+            captionMaterial = new Material(caption.fontSharedMaterial) { name = "Opening Caption Readability" };
+            captionMaterial.EnableKeyword("UNDERLAY_ON");
+            captionMaterial.SetColor("_UnderlayColor", new Color(0.02f, 0.04f, 0.06f, 0.9f));
+            captionMaterial.SetFloat("_UnderlayOffsetY", -0.5f);
+            captionMaterial.SetFloat("_UnderlaySoftness", 0.65f);
+            caption.fontSharedMaterial = captionMaterial;
+
+            shadeTexture = new Texture2D(1, 64, TextureFormat.RGBA32, false) { name = "Opening Soft Caption Shade" };
+            shadeTexture.wrapMode = TextureWrapMode.Clamp;
+            for (int y = 0; y < 64; y++)
+                shadeTexture.SetPixel(0, y, new Color(0, 0, 0, 0.68f * Mathf.Pow(1f - y / 63f, 1.5f)));
+            shadeTexture.Apply();
+            shadeSprite = Sprite.Create(shadeTexture, new Rect(0, 0, 1, 64), new Vector2(0.5f, 0.5f));
+            var shadeObject = new GameObject("Soft Caption Shade", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+            shadeObject.transform.SetParent(picture.transform.parent, false);
+            shadeObject.transform.SetSiblingIndex(picture.transform.GetSiblingIndex() + 1);
+            captionShade = shadeObject.GetComponent<UnityEngine.UI.Image>();
+            captionShade.sprite = shadeSprite; captionShade.raycastTarget = false;
+            SetRect(captionShade.rectTransform, Vector2.zero, new Vector2(1f, 0.36f));
+
+            SetRect(nextButton.GetComponent<RectTransform>(), new Vector2(0.80f, 0.92f), new Vector2(0.89f, 0.985f));
+            SetRect(skipButton.GetComponent<RectTransform>(), new Vector2(0.90f, 0.92f), new Vector2(0.985f, 0.985f));
+            foreach (var button in new[] { nextButton, skipButton })
+            {
+                var background = button.GetComponent<UnityEngine.UI.Image>();
+                if (background != null) background.color = new Color(0.02f, 0.04f, 0.04f, 0.18f);
+                TMP_Text label = button.GetComponentInChildren<TMP_Text>();
+                if (label != null) { label.fontSize = 24; label.fontSharedMaterial = captionMaterial; }
+            }
+            var hintObject = new GameObject("Story Navigation Hint", typeof(RectTransform), typeof(TextMeshProUGUI));
+            hintObject.transform.SetParent(captionGroup.transform, false);
+            navigationHint = hintObject.GetComponent<TextMeshProUGUI>();
+            navigationHint.font = caption.font; navigationHint.fontSharedMaterial = captionMaterial;
+            navigationHint.text = KeyHintUnderlines.Format("Space / Enter   Next     Esc   Skip");
+            navigationHint.fontSize = 24; navigationHint.color = new Color(1f, 0.97f, 0.88f, 0.95f);
+            navigationHint.alignment = TextAlignmentOptions.Right; navigationHint.raycastTarget = false;
+            SetRect(navigationHint.rectTransform, new Vector2(0.52f, 0.025f), new Vector2(0.97f, 0.065f));
+            KeyHintUnderlines.Attach(navigationHint);
+        }
+
+        private void LateUpdate()
+        {
+            if (storybookLayout && !IsLoading) FitStoryPicture();
+        }
+
+        private void FitStoryPicture()
+        {
+            if (picture == null || picture.sprite == null) return;
+            var parent = picture.rectTransform.parent as RectTransform;
+            if (parent == null || parent.rect.height <= 0 || parent.rect.width <= 0) return;
+            if (lastStoryScreenSize == parent.rect.size && lastStorySprite == picture.sprite) return;
+            lastStoryScreenSize = parent.rect.size;
+            lastStorySprite = picture.sprite;
+            float aspect = picture.sprite.rect.width / picture.sprite.rect.height;
+            float width = Mathf.Max(parent.rect.width, parent.rect.height * aspect);
+            RectTransform rect = picture.rectTransform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(width, width / aspect);
         }
     }
 }

@@ -63,3 +63,9 @@ Checked 2026-11-14 from the network checkout. This technical snapshot supports t
 Menu Play now enters `Opening_Chapter1`, then the existing Village/Core bootstrap. The three placeholder story beats and Chapter I card are configurable in `Assets/_Project/Data/Storyboards/Opening_Chapter1.asset`. Standalone level debugging bypasses the sequence. Normal playback, replay and command-invoked Skip were observed in the actual Editor; owner acceptance of this new sequence is pending. See `Docs/Opening_Chapter1_Placeholder_Unity_Handoff.md` and its screenshot evidence. Earlier unavailable-MCP statements above are dated history; this run verified the official MCP against the actual project. The surface audio batch follows separately.
 
 Surface audio v1 is now imported/integrated/compiled with actual Editor cue observations; owner listening remains pending. `SurfaceAudioProfile` applies the explicit `Chapter1_SurfaceAudio_v1.json` collider mapping at level bootstrap; `NiamhSurfaceAudio` reads the controller's ground collider/jump event and current v8 animation phase. Core has a narrow opt-out component addition, while level files and v8 curves were not rebuilt. See `Docs/Niamh_Surface_Audio_Unity_Handoff.md` for data, staging limits and rollback. Opening batch checkpoint: `673bbcc`; final cleanup/publication is in its handoff.
+
+## 2026-11-18 当前任务 开场界面和举高十字架
+
+设计端已将本轮代码与举高姿势复制进实际工程，离线 C# 类型检查通过，尚未在 Editor 导入/Play Mode 验证。负责人已授权网络电脑 Codex 继续检查。任务单唯一入口留在共享设计仓库 `CommandForAgentToInitialRun/2026-11-18_Opening_Immersive_Cross_Raise_Unity_Validation.md`，直接从共享目录读取，不复制任务单进Unity工程。沿现有代码做实机检查与最小修复；不要重跑11月14日旧任务或重建关卡。素材/代码散列见 `Docs/References/Opening_Immersive_Cross_Raise_2026-11-18/implementation_manifest.json`。
+
+这轮包括守灯人式铺满故事画与叠加字幕、按键字母下划线、Q 对受控红墙时直接举高十字架并恢复。采用 B，无胸前中间停留；保留原墙体效果，不新增大光束。完成后写 `Docs/Opening_Immersive_Cross_Raise_Unity_Handoff.md` 和同目录 `Unity_Trial/result.json`。用户要求做完后设计端汇总文档再 git push；网络端本地提交自己的任务文件，暂不 push。保护原场景/字体/AGENTS 修改。文件交接已完成不等于 Codex 已启动。

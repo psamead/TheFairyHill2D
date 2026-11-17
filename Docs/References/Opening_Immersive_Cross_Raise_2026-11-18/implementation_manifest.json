@@ -1,0 +1,83 @@
+{
+  "unity_root": "\\\\haoxi-rtx\\C\\Users\\Administrator\\Documents\\UnityProject\\TheFairyHill2D",
+  "head": "633a1a774d9d4881b85218b5e7376289f3485381",
+  "files": [
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/OpeningSequencePlayer.cs",
+      "sha256": "eaf603befb07e842a7b7e2fb9d348b82b256092db0c1c0dffc7bf0ee5d82537b"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/OpeningSequenceData.cs",
+      "sha256": "8b05ab153eaba14fe4d5ad451a5dd4444a638d68165a0645c1737c42c9b9675c"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/NiamhMotionV8Presentation.cs",
+      "sha256": "baf59d09029ec762439324070c0a4e1db2280297c71aff1b44b5c1bdeb06eed9"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/PlayerController2D.cs",
+      "sha256": "2ec279e9875d46357758bfbd4be11f192915b6ffcd4ce82e52ca55813c6aa8ca"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/ThornWall.cs",
+      "sha256": "f857b002dff38253c6d70e245141e977fd6567f51752ce3058279b4da5b67777"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/ChapterHUD.cs",
+      "sha256": "7b515625bc4fc083145043b02158f2021834fb24ff3eee331275e9de5f1d0bd6"
+    }
+  ],
+  "protected_sha256": {
+    "AGENTS.md": "d0769511b4b36a1e862bd5b62d7ae423f68ea63b85b6ba2f6516cc6f5d2c6f67",
+    "Assets/Scenes/Ch1_S1_Village.unity": "8baeae09fc8cb2a9eb24651a7d8b4721b7f8049fc3521805b42698947f175adb",
+    "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset": "f53586850a70c4f308e7e71b99b63881a49f38de4bd40f4edb7fe7ae6ecf8a52",
+    "Assets/_Project/Fonts/Fondamento SDF.asset": "877add5fd5f66283e9693670ceed50b0da4840091a6bf1cb56303403483d2c36"
+  },
+  "applied_files": [
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/ChapterHUD.cs",
+      "sha256": "6e246f291e2fc4a7db53c2e0d636d15776089a5569310e5089a181bc41f8941d"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/KeyHintUnderlines.cs",
+      "sha256": "9192d3110971e2b48e8fcaa6c696acdbd3f15f4a9b7fc8839ec73b018100adcf"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/NiamhMotionV8Presentation.cs",
+      "sha256": "d711f0c397f3f93e7b65278371f9e33988bced878fb52586ea7e0c8e1943f52b"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/OpeningSequenceData.cs",
+      "sha256": "3caafada321226b1c73e72f185fe228c5f735479e5f52d821cbd355d9e15276b"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/OpeningSequencePlayer.cs",
+      "sha256": "ce6465e3aaad49e396885749862a106d09edfc78207f1bb69cae9382092f0d46"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/PlayerController2D.cs",
+      "sha256": "a25fab4b7f347fc98a47ee93dc15d3a401ec76d358ec64c8a22bd70185f45238"
+    },
+    {
+      "path": "Assets/_Project/Scripts/Gameplay/ThornWall.cs",
+      "sha256": "70d37ecc4467cba2b3ddb94dcaf5e75730a6a2c47ddc8e37dddca2fe1cc41d81"
+    },
+    {
+      "path": "Assets/_Project/Resources/Niamh/CrossRaisedStory.png",
+      "sha256": "f708046d9789ff53e2b1956d8153300bb09782458e502392ce414a6a2b5df86f",
+      "source": "TechArtAsset/Characters/Niamh/Cross_Actions/current/Niamh_cross_raised_story_v1.png",
+      "canvas": [
+        350,
+        699
+      ],
+      "pivot_px": [
+        163.5,
+        0
+      ],
+      "ppu": 100
+    }
+  ],
+  "editor_import_verified": false,
+  "playmode_verified": false,
+  "checkpoint_commit": "3a38c22"
+}
