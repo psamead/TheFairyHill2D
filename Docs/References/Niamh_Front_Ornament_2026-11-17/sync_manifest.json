@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-17",
+  "source_psd": "TechArtAsset\\Characters\\Niamh\\Cross_Actions\\current\\Niamh_cross_raised_story_v1.psd",
+  "source_sha256": "3d617fa93a054623aea6c4ab46737f1f699d94edb995051c68b74434bcd80408",
+  "patch_layer": "lower_front_costume_user_patch",
+  "patch_bounds": [
+    253,
+    372,
+    292,
+    453
+  ],
+  "scope": "front garment ornament only",
+  "source_user_psds_modified": false,
+  "silhouette_alpha_unchanged": true,
+  "validation": "RGBA equals original plus same-origin patch; alpha byte-identical",
+  "local_updates": [
+    {
+      "target": "TechArtAsset\\Characters\\Niamh\\Cross_Actions\\current\\Niamh_cross_chest_local_v1.psd",
+      "before_sha256": "287639e088c7dfe5ea0f9a2e7af54d4633215ae430ef31f9d5fb3688b5a71743",
+      "changed_pixel_bounds": [
+        254,
+        372,
+        292,
+        451
+      ]
+    },
+    {
+      "target": "TechArtAsset\\Characters\\Niamh\\Motion_v8\\parts\\body.png",
+      "before_sha256": "5b6f589a2384d93f3b1165e47d471a9e3bc6dd420d2f1ca140f8b47539f48779",
+      "changed_pixel_bounds": [
+        254,
+        372,
+        292,
+        451
+      ]
+    },
+    {
+      "target": "TechArtAsset\\Characters\\Niamh\\Niamh_side_static_v3.png",
+      "before_sha256": "1634159e881d0614428c13b0611577dac3723297e75471d493be9df6a02b1101",
+      "changed_pixel_bounds": [
+        253,
+        372,
+        292,
+        451
+      ]
+    }
+  ],
+  "unity_updates": [
+    {
+      "path": "Assets/_Project/Art/Characters/Niamh/Motion_v8_Source/parts/body.png",
+      "before_sha256": "5b6f589a2384d93f3b1165e47d471a9e3bc6dd420d2f1ca140f8b47539f48779",
+      "after_sha256": "372d55d958cab561316ac5f0454f46f4977f34a602fbaaabcab2ed9dc21ca472",
+      "meta_sha256_unchanged": "9b27b29f2e97e510a3561359678affc77658c25e91164ac51508640514c38b71",
+      "reason": "existing Motion_v8 prefab body GUID, or static fallback/builder source"
+    },
+    {
+      "path": "Assets/_Project/Art/Characters/Niamh/Niamh_side_static_v3.png",
+      "before_sha256": "1634159e881d0614428c13b0611577dac3723297e75471d493be9df6a02b1101",
+      "after_sha256": "f57004b7112bcffdb5f994d49f6bb6e385093110020bf98656e651ca1ce79694",
+      "meta_sha256_unchanged": "97acfbc48c72357db6976a00298de4aba5a47e288879acc9c7b0c26ca5fa48ff",
+      "reason": "existing Motion_v8 prefab body GUID, or static fallback/builder source"
+    }
+  ],
+  "unity_playmode_verified": false,
+  "unity_texture_files_copied": true,
+  "motion_preview_regenerated_from_updated_body": true
+}
